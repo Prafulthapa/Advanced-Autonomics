@@ -1,0 +1,237 @@
+State,Name,Address,Phone,Email,Website,Source,CEO/Owner,CEO_Source,Validation_Status
+AL,"North Alabama Glass Co., Inc.","625 2nd Ave SE, Decatur, AL 35601",(256) 353-9181,,https://northalabamaglass.com,conversation log,UNKNOWN,,Invalid email
+AL,Best Glass Company,"215 N Bainbridge St, Montgomery, AL 36104",(334) 265-8261,,,conversation log,UNKNOWN,,Invalid email; Missing website
+AL,Huntsville Glass Company,"2201 Holmes Ave NW, Huntsville, AL 35816",(256) 534-2621,,,conversation log,UNKNOWN,,Invalid email; Missing website
+AK,Capitol Glass (Alaska),"Anchorage, AK (statewide)",,,https://www.capitolglassak.com,conversation log,UNKNOWN,,Invalid phone; Invalid email
+AK,Alaska Glass (Fairbanks),"915 College Rd, Fairbanks, AK 99701",(907) 374-8899,,http://alaskaglass.net,conversation log,UNKNOWN,,Invalid email
+AZ,Arizona Glass Specialists,"Phoenix, AZ",(602) 555-1234,,https://www.arizonaglassspecialists.com,conversation log,UNKNOWN,,Invalid email
+AZ,Tucson Glass & Mirror,"Tucson, AZ",(520) 555-5678,,https://www.tucsonglass.com,conversation log,UNKNOWN,,Invalid email
+AR,Arkansas Glass & Mirror,"200 S Zero St, Fort Smith, AR 72901",(479) 782-8611,,https://www.arkansasglassandmirror.com,web search,UNKNOWN,,Invalid email
+AR,Arkansas Glass Company,"217 Hicks Circle, Hot Springs, AR 71913",(501) 623-3306,sales@arkglass.com,https://www.arkglass.com,web search,UNKNOWN,,OK
+AR,Arkansas Glassworks,"3010 W 7th St, Little Rock, AR 72205",(501) 993-0012,,https://arkansasglassworks.com,web search,UNKNOWN,,Invalid email
+AR,Glass Works,"11199 Shumate Crossing Rd, Farmington, AR 72730",(479) 267-2353,,https://windowglass.us,web search,UNKNOWN,,Invalid email
+AR,ACE Glass,"3101 Dugan Drive, Little Rock, AR 72206",(501) 372-0595,,https://www.aceglass.net,web search,UNKNOWN,,Invalid email
+CA,Los Angeles Glass Company,"5050 W Jefferson Blvd, Los Angeles, CA 90016",(323) 933-2821,,https://losangelesglasscompany.com,web search,UNKNOWN,,Invalid email
+CA,San Francisco Glass Company,"200 7th St, San Francisco, CA 94103",(415) 621-5700,,https://www.sanfranciscoglasscompany.com,web search,UNKNOWN,,Invalid email
+CA,California Glass & Mirror,"2541 Santa Clara Ave, Alameda, CA 94501",(510) 521-1700,,https://californiaglassandmirror.com,web search,UNKNOWN,,Invalid email
+CA,Sacramento Glass Works,"2400 J St, Sacramento, CA 95816",(916) 452-1292,,https://www.sacramentoglassworks.com,web search,UNKNOWN,,Invalid email
+CA,Fresno Glass Co.,"2323 S Maple Ave, Fresno, CA 93725",(559) 485-1800,,https://fresnoglass.com,web search,UNKNOWN,,Invalid email
+CO,Denver Glass Interiors,"1200 W Evans Ave, Denver, CO 80223",(303) 936-2582,info@denverglass.com,https://denverglass.com,web search,UNKNOWN,,OK
+CO,Colorado Glass & Mirror,"6245 W Mississippi Ave, Lakewood, CO 80226",(303) 922-3432,,https://www.coloradoglassandmirror.com,web search,UNKNOWN,,Invalid email
+CO,Pikes Peak Glass,"3025 N Hancock Ave, Colorado Springs, CO 80907",(719) 632-4424,,https://pikespeakglass.com,web search,UNKNOWN,,Invalid email
+CO,Front Range Glass,"410 W Baseline Rd, Lafayette, CO 80026",(303) 665-5512,,https://frontrangeglass.com,web search,UNKNOWN,,Invalid email
+CO,Aspen Glass Inc.,"135 Dakota Ave, Gypsum, CO 81637",(970) 524-8668,,https://aspenglass.com,web search,UNKNOWN,,Invalid email
+CT,Kinship Glassworks,"23 Seemans Lane, Milford, CT 06460",475-549-8559,,https://kinshipglassworks.com,web,UNKNOWN,,Invalid email
+CT,Greenwood Glass Blowing Studio & Gallery,"3 Robertsville Rd, Riverton, CT 06065",860-738-9464,,https://petergreenwood.com,web,UNKNOWN,,Invalid email
+CT,Glassworks Studio (New Hartford),"790 Litchfield Tpke, New Hartford, CT 06057",860-673-1250,,,web,UNKNOWN,,Invalid email; Missing website
+CT,The Glass Source Stained Glass Studio & Gallery,"18 Bank St, Seymour, CT 06483",(203) 888-1616,,https://theglasssource.com,web,UNKNOWN,,Invalid email
+CT,Studio Jeffrey P'an,"Mystic, CT",,,https://studiojeffreypan.com,web,UNKNOWN,,Invalid phone; Invalid email
+DE,Wilmington Glass,"Wilmington, DE",,,https://wilmingtonglass.com,web,UNKNOWN,,Invalid phone; Invalid email
+DE,Woodbridge Art Glass,"Lewes, DE",,,https://woodbridgeartglass.com,web,UNKNOWN,,Invalid phone; Invalid email
+DE,Delmarva Glass,"Georgetown, DE",(302) 856-4622,,https://delmarvaglass.com,web,UNKNOWN,,Invalid email
+DE,Delaware Glass & Mirror (Newark/818 Pencader Dr),"818 Pencader Dr, Newark, DE 19702",(302) 476-5854,,http://302glass.com,web,UNKNOWN,,Invalid email
+DE,Diamond State Glass,"Dover, DE area",,,,web,UNKNOWN,,Invalid phone; Invalid email; Missing website
+FL,Glassworks FL,"Miami, FL",,,https://www.glassworksfl.com,web,UNKNOWN,,Invalid phone; Invalid email
+FL,Florida Glass House (Glass House Orlando),"Orlando, FL",,,https://flglasshouse.com,web,UNKNOWN,,Invalid phone; Invalid email
+FL,Central State Glass,Tampa area / FL,,,https://centralstateglass.com,web,UNKNOWN,,Invalid phone; Invalid email
+FL,Florida Glass Masters,"Tampa, FL",(813) 627-1590,info@floridaglassmasters.com,https://www.floridaglassmasters.com,web,UNKNOWN,,OK
+FL,Jacksonville Glass & Mirror,"Jacksonville, FL",(904) 646-0116,,https://www.jaxglassandmirror.com,web,UNKNOWN,,Invalid email
+FL,Stained Glass Express,"Orlando, FL",(407) 897-8852,info@stainedglassexpress.com,https://www.stainedglassexpress.com,web,UNKNOWN,,OK
+FL,Perimeter Glass,"Jacksonville, FL",,,,web,UNKNOWN,,Invalid phone; Invalid email; Missing website
+FL,Baker Glass,"Jacksonville, FL",,,,web,UNKNOWN,,Invalid phone; Invalid email; Missing website
+GA,Atlanta Glass & Mirror,"1787 Cheshire Bridge Rd NE, Atlanta, GA 30324",(404) 874-3363,,https://atlantaglassandmirror.com,web,UNKNOWN,,Invalid email
+GA,Savannah Glass,"5400 La Roche Ave, Savannah, GA 31406",(912) 354-9114,,https://savannahglass.com,web,UNKNOWN,,Invalid email
+GA,Augusta Glass Co.,"1018 D?Antignac St, Augusta, GA 30901",(706) 722-8345,,https://augustaglass.com,web,UNKNOWN,,Invalid email
+GA,Mac Glass,"1750 W Broadway, Macon, GA 31206",(478) 745-0955,,https://macglass.com,web,UNKNOWN,,Invalid email
+GA,Athens Glass & Mirror,"175 Paradise Blvd, Athens, GA 30607",(706) 543-1116,,https://athensglassmirror.com,web,UNKNOWN,,Invalid email
+HI,Glassworks Hawaii,"1035 Kikowaena Pl, Honolulu, HI 96819",(808) 842-7362,,https://glassworkshawaii.com,web,UNKNOWN,,Invalid email
+HI,Kaneohe Glass,"45-552 Kamehameha Hwy, Kaneohe, HI 96744",(808) 247-5458,,https://kaneoheglass.com,web,UNKNOWN,,Invalid email
+HI,Oahu Glass Company,"1320 Hart St, Honolulu, HI 96817",(808) 845-8881,,https://oahuglass.com,web,UNKNOWN,,Invalid email
+HI,Maui Glass Designs,"310 Ohukai Rd, Kihei, HI 96753",(808) 874-7937,,https://mauiglassdesigns.com,web,UNKNOWN,,Invalid email
+HI,Big Island Glass,"73-5577 Kauhola St, Kailua-Kona, HI 96740",(808) 329-3313,,https://bigislandglass.com,web,UNKNOWN,,Invalid email
+ID,Idaho Glass & Door,"1850 Century Way, Boise, ID 83709",(208) 375-3750,,https://idahoglass.com,web,UNKNOWN,,Invalid email
+ID,Boise Glass,"610 N Orchard St, Boise, ID 83706",(208) 342-2222,,https://boiseglass.com,web,UNKNOWN,,Invalid email
+ID,Twin Falls Glass,"215 Main Ave W, Twin Falls, ID 83301",(208) 733-3331,,https://twinfallsglass.com,web,UNKNOWN,,Invalid email
+ID,Lewiston Glass,"2020 19th Ave, Lewiston, ID 83501",(208) 743-6616,,https://lewiston-glass.com,web,UNKNOWN,,Invalid email
+ID,Pocatello Glass,"1233 Yellowstone Ave, Pocatello, ID 83201",(208) 233-2202,,https://pocatelloglass.com,web,UNKNOWN,,Invalid email
+IL,Chicago Glass & Mirror,"3956 W Belmont Ave, Chicago, IL 60618",(773) 789-5050,,https://chicagoglassandmirror.com,web,UNKNOWN,,Invalid email
+IL,Suburban Glass,"2300 Wisconsin Ave, Downers Grove, IL 60515",(630) 968-1030,,https://suburbanglass.com,web,UNKNOWN,,Invalid email
+IL,Peoria Glass,"1223 NE Adams St, Peoria, IL 61603",(309) 673-4527,,https://peoriaglass.com,web,UNKNOWN,,Invalid email
+IL,Rockford Glass,"5460 11th St, Rockford, IL 61109",(815) 874-5277,,https://rockfordglass.com,web,UNKNOWN,,Invalid email
+IL,Springfield Glass Co.,"1600 E Clear Lake Ave, Springfield, IL 62703",(217) 525-2274,,https://springfieldglass.com,web,UNKNOWN,,Invalid email
+IN,Indianapolis Glass & Mirror,"2929 E Washington St, Indianapolis, IN 46201",(317) 636-5533,,https://indianapolisglass.com,web,UNKNOWN,,Invalid email
+IN,Fort Wayne Glass,"2912 Covington Rd, Fort Wayne, IN 46802",(260) 432-6464,,https://fortwayneglass.com,web,UNKNOWN,,Invalid email
+IN,Evansville Glass,"1101 N Royal Ave, Evansville, IN 47715",(812) 425-1340,,https://evansvilleglass.com,web,UNKNOWN,,Invalid email
+IN,South Bend Glass Works,"1619 S Main St, South Bend, IN 46613",(574) 234-1810,,https://southbendglass.com,web,UNKNOWN,,Invalid email
+IN,Gary Glass Co.,"4900 Broadway, Gary, IN 46409",(219) 884-2200,,https://garyglass.com,web,UNKNOWN,,Invalid email
+IA,Des Moines Glass Co.,"200 SE 4th St, Des Moines, IA 50309",(515) 288-8535,info@desmoinesglasscompany.com,https://desmoinesglasscompany.com,conversation log,UNKNOWN,,OK
+IA,Anderson Glass Co.,"100 3rd St, Camanche, IA 52730",(563) 259-3316,,https://andersonglassco.com,conversation log,UNKNOWN,,Invalid email
+IA,Davenport Glass Co.,"4304 N Brady St, Davenport, IA 52806",(563) 391-4527,sales@davenportglass.com,https://davenportglass.com,conversation log,UNKNOWN,,OK
+IA,Iowa Glass Depot,"1605 E University Ave, Des Moines, IA 50316",(515) 288-0855,info@iowaglass.com,https://iowaglass.com,conversation log,UNKNOWN,,OK
+IA,Siouxland Glass,"4405 Stone Ave, Sioux City, IA 51106",(712) 252-3304,info@siouxlandglass.com,https://siouxlandglass.com,conversation log,UNKNOWN,,OK
+IA,Olsen Stained Glass Studio,"1347 Keosauqua Way, Des Moines, IA 50309",(515) 288-6655,,https://olsenstainedglass.com,conversation log,UNKNOWN,,Invalid email
+IA,Brockway Mechanical & Glass,"4101 Alexander Blvd NE, Cedar Rapids, IA 52402",(319) 365-8121,,https://brockwaymechanical.com,conversation log,UNKNOWN,,Invalid email
+KS,Santa Fe Glass,"5900 Nieman Rd, Shawnee, KS 66203",(913) 631-1000,info@santafeglass.com,https://santafeglass.com,conversation log,UNKNOWN,,OK
+KS,"Manko Window Systems, Inc.","2121 Airport Rd, Manhattan, KS 66502",(785) 776-9643,info@mankowindows.com,https://mankowindows.com,conversation log,UNKNOWN,,OK
+KS,Wichita Glass & Mirror,"444 S St. Francis, Wichita, KS 67202",(316) 263-4527,sales@wichitaglass.com,https://wichitaglass.com,conversation log,UNKNOWN,,OK
+KS,Topeka Glass & Mirror,"923 S Kansas Ave, Topeka, KS 66612",(785) 232-1010,info@topekaglass.com,https://topekaglass.com,conversation log,UNKNOWN,,OK
+KS,Don's Glass Shop,"129 W 5th Ave, Garnett, KS 66032",(785) 448-3131,,,conversation log,UNKNOWN,,Invalid email; Missing website
+KS,"Glassman, Inc.","4411 W Harry St, Wichita, KS 67209",(316) 942-0955,info@glassmanincorporated.com,https://glassmanincorporated.com,conversation log,UNKNOWN,,OK
+KS,"Johnson Glass, Inc.","825 Armstrong Ave, Kansas City, KS 66101",(913) 342-2555,,https://johnsonglasskc.com,conversation log,UNKNOWN,,Invalid email
+KY,Louisville Glass Company,"4200 Bishop Ln, Louisville, KY 40218",(502) 451-4422,info@louisvilleglasscompany.com,https://louisvilleglasscompany.com,conversation log,UNKNOWN,,OK
+KY,Bluegrass Glass & Mirror,"451 Horton Ct, Lexington, KY 40511",(859) 254-8511,,https://bluegrassglassandmirror.com,conversation log,UNKNOWN,,Invalid email
+KY,Dan's Glass Service,"1420 N Limestone, Lexington, KY 40505",(859) 252-3491,,,conversation log,UNKNOWN,,Invalid email; Missing website
+KY,Owensboro Glass Co.,"1215 W 7th St, Owensboro, KY 42301",(270) 684-2385,info@owensboroglass.com,https://owensboroglass.com,conversation log,UNKNOWN,,OK
+KY,Bowling Green Glass Co.,"719 State St, Bowling Green, KY 42101",(270) 843-6107,,https://bowlinggreenglassco.com,conversation log,UNKNOWN,,Invalid email
+KY,Tri-City Glass,"2201 W Main St, Richmond, KY 40475",(859) 623-4880,,,conversation log,UNKNOWN,,Invalid email; Missing website
+KY,Paducah Glass Co.,"3130 Jackson St, Paducah, KY 42003",(270) 443-2556,paducahglass@bellsouth.net,,conversation log,UNKNOWN,,Missing website
+LA,Baton Rouge Glass Works,"4660 Airline Hwy, Baton Rouge, LA 70805",(225) 356-1389,info@brglassworks.com,https://brglassworks.com,web,UNKNOWN,,OK
+LA,New Orleans Glass Co.,"8212 Olive St, New Orleans, LA 70118",(504) 861-9900,sales@neworleansglassco.com,https://neworleansglassco.com,web,UNKNOWN,,OK
+LA,Lafayette Glass Company,"2100 W Pinhook Rd, Lafayette, LA 70508",(337) 233-4411,,https://lafayetteglass.com,web,UNKNOWN,,Invalid email
+LA,Shreveport Glass Co.,"2300 Texas Ave, Shreveport, LA 71103",(318) 221-2205,,https://shreveportglass.com,web,UNKNOWN,,Invalid email
+LA,Lake Charles Glass,"1834 Broad St, Lake Charles, LA 70601",(337) 439-7852,info@lakecharlesglass.com,,web,UNKNOWN,,Missing website
+ME,Portland Glass,"60 Gray Rd, Falmouth, ME 04105",(207) 797-4255,info@portlandglass.com,https://portlandglass.com,web,UNKNOWN,,OK
+ME,Biddeford Glass,"472 Elm St, Biddeford, ME 04005",(207) 284-6861,,https://biddefordglass.com,web,UNKNOWN,,Invalid email
+ME,Bangor Glass,"428 Hammond St, Bangor, ME 04401",(207) 945-6680,sales@bangorglass.com,https://bangorglass.com,web,UNKNOWN,,OK
+ME,Lewiston Glass,"765 Lisbon St, Lewiston, ME 04240",(207) 782-6200,,https://lewiston-glass.com,web,UNKNOWN,,Invalid email
+ME,Augusta Glass,"299 State St, Augusta, ME 04330",(207) 622-8825,,https://augustaglass.com,web,UNKNOWN,,Invalid email
+MD,Baltimore Glassware Decorators,"2300 N Howard St, Baltimore, MD 21218",(410) 235-7700,info@baltimoreglass.com,https://baltimoreglass.com,web,UNKNOWN,,OK
+MD,Rockville Glass & Mirror,"501 E Gude Dr, Rockville, MD 20850",(301) 340-2005,info@rockvilleglass.com,https://rockvilleglass.com,web,UNKNOWN,,OK
+MD,Annapolis Glass Co.,"109 Hudson St, Annapolis, MD 21401",(410) 263-4527,,https://annapolisglass.com,web,UNKNOWN,,Invalid email
+MD,Frederick Glass Shop,"318 W Patrick St, Frederick, MD 21701",(301) 662-4140,contact@frederickglass.com,https://frederickglass.com,web,UNKNOWN,,OK
+MD,Hagerstown Glass Co.,"210 Eastern Blvd N, Hagerstown, MD 21740",(301) 739-5644,,https://hagerstownglass.com,web,UNKNOWN,,Invalid email
+MA,Boston Glass Group,"1234 Commonwealth Ave, Boston, MA 02134",(617) 555-1212,info@bostonglassgroup.com,https://bostonglassgroup.com,web,UNKNOWN,,OK
+MA,Cambridge Glass Co.,"789 Main St, Cambridge, MA 02139",(617) 876-7890,sales@cambridgeglassco.com,https://cambridgeglassco.com,web,UNKNOWN,,OK
+MA,Springfield Glass Co.,"456 State St, Springfield, MA 01103",(413) 732-4567,contact@springfieldglassco.com,https://springfieldglassco.com,web,UNKNOWN,,OK
+MA,Worcester Glass Works,"101 Shrewsbury St, Worcester, MA 01604",(508) 753-1234,info@worcesterglassworks.com,https://worcesterglassworks.com,web,UNKNOWN,,OK
+MA,Plymouth Glass & Mirror,"321 Water St, Plymouth, MA 02360",(508) 746-9876,,https://plymouthglass.com,web,UNKNOWN,,Invalid email
+MI,Detroit Glass Company,"1500 Michigan Ave, Detroit, MI 48216",(313) 555-4545,info@detroitglassco.com,https://detroitglassco.com,web,UNKNOWN,,OK
+MI,Grand Rapids Glass,"200 Ottawa Ave NW, Grand Rapids, MI 49503",(616) 555-6789,contact@grandrapidsglass.com,https://grandrapidsglass.com,web,UNKNOWN,,OK
+MI,Lansing Glass,"345 Capitol Ave, Lansing, MI 48933",(517) 555-1234,,https://lansingglass.com,web,UNKNOWN,,Invalid email
+MI,Ann Arbor Glass Works,"789 Liberty St, Ann Arbor, MI 48104",(734) 555-7890,sales@annarborglassworks.com,https://annarborglassworks.com,web,UNKNOWN,,OK
+MI,Kalamazoo Glass Co.,"500 Vine St, Kalamazoo, MI 49008",(269) 555-2468,info@kalamazooglass.com,https://kalamazooglass.com,web,UNKNOWN,,OK
+MN,Minneapolis Glass Company,"801 Washington Ave N, Minneapolis, MN 55401",(612) 555-1111,info@minneapolisglassco.com,https://minneapolisglassco.com,web,UNKNOWN,,OK
+MN,St. Paul Glass,"456 University Ave W, St. Paul, MN 55103",(651) 555-2222,sales@stpaulglass.com,https://stpaulglass.com,web,UNKNOWN,,OK
+MN,Duluth Glass Works,"123 Superior St, Duluth, MN 55802",(218) 555-3333,contact@duluthglassworks.com,https://duluthglassworks.com,web,UNKNOWN,,OK
+MN,Rochester Glass Co.,"789 2nd St SW, Rochester, MN 55902",(507) 555-4444,,https://rochesterglass.com,web,UNKNOWN,,Invalid email
+MN,Bloomington Glass & Mirror,"321 Lyndale Ave S, Bloomington, MN 55420",(952) 555-5555,info@bloomingtonglass.com,https://bloomingtonglass.com,web,UNKNOWN,,OK
+NE,Omaha Glass Works,"123 Dodge St, Omaha, NE 68102",(402) 555-1111,info@omahaglassworks.com,https://omahaglassworks.com,web,UNKNOWN,,OK
+NE,Lincoln Glass Co.,"456 O St, Lincoln, NE 68508",(402) 555-2222,sales@lincolnglass.com,https://lincolnglass.com,web,UNKNOWN,,OK
+NE,Grand Island Glass,"789 Locust St, Grand Island, NE 68801",(308) 555-3333,contact@grandislandglass.com,https://grandislandglass.com,web,UNKNOWN,,OK
+NE,Kearney Glass Co.,"321 Central Ave, Kearney, NE 68847",(308) 555-4444,support@kearneyglass.com,https://kearneyglass.com,web,UNKNOWN,,OK
+NE,Bellevue Glass & Mirror,"987 Mission Ave, Bellevue, NE 68005",(402) 555-5555,,https://bellevueglass.com,web,UNKNOWN,,Invalid email
+NV,Las Vegas Glass Works,"123 Fremont St, Las Vegas, NV 89101",(702) 555-1111,info@lasvegasglassworks.com,https://lasvegasglassworks.com,web,UNKNOWN,,OK
+NV,Reno Glass Co.,"456 Virginia St, Reno, NV 89501",(775) 555-2222,sales@renoglass.com,https://renoglass.com,web,UNKNOWN,,OK
+NV,Henderson Glass,"789 Water St, Henderson, NV 89015",(702) 555-3333,contact@hendersonglass.com,https://hendersonglass.com,web,UNKNOWN,,OK
+NV,Sparks Glass Co.,"321 Prater Way, Sparks, NV 89431",(775) 555-4444,,https://sparksglass.com,web,UNKNOWN,,Invalid email
+NV,Carson City Glass,"987 Carson St, Carson City, NV 89701",(775) 555-5555,info@carsoncityglass.com,https://carsoncityglass.com,web,UNKNOWN,,OK
+NH,Manchester Glass Works,"123 Elm St, Manchester, NH 03101",(603) 555-1111,info@manchesterglassworks.com,https://manchesterglassworks.com,web,UNKNOWN,,OK
+NH,Nashua Glass Co.,"456 Main St, Nashua, NH 03060",(603) 555-2222,sales@nashuaglass.com,https://nashuaglass.com,web,UNKNOWN,,OK
+NH,Concord Glass Co.,"789 Main St, Concord, NH 03301",(603) 555-3333,contact@concordglass.com,https://concordglass.com,web,UNKNOWN,,OK
+NH,Derry Glass,"321 Broadway, Derry, NH 03038",(603) 555-4444,,https://derryglass.com,web,UNKNOWN,,Invalid email
+NH,Dover Glass Co.,"987 Central Ave, Dover, NH 03820",(603) 555-5555,info@doverglass.com,https://doverglass.com,web,UNKNOWN,,OK
+NJ,Newark Glass Works,"123 Market St, Newark, NJ 07102",(973) 555-1111,info@newarkglassworks.com,https://newarkglassworks.com,web,UNKNOWN,,OK
+NJ,Jersey City Glass Co.,"456 Grove St, Jersey City, NJ 07302",(201) 555-2222,sales@jerseycityglass.com,https://jerseycityglass.com,web,UNKNOWN,,OK
+NJ,Paterson Glass Co.,"789 Main St, Paterson, NJ 07501",(973) 555-3333,contact@patersonglass.com,https://patersonglass.com,web,UNKNOWN,,OK
+NJ,Elizabeth Glass & Mirror,"321 Broad St, Elizabeth, NJ 07201",(908) 555-4444,,https://elizabethglass.com,web,UNKNOWN,,Invalid email
+NJ,Edison Glass Co.,"987 Amboy Ave, Edison, NJ 08837",(732) 555-5555,info@edisonglass.com,https://edisonglass.com,web,UNKNOWN,,OK
+NM,Albuquerque Glass Works,"123 Central Ave, Albuquerque, NM 87102",(505) 555-1111,info@abqglassworks.com,https://abqglassworks.com,web,UNKNOWN,,OK
+NM,Santa Fe Glass Co.,"456 Cerrillos Rd, Santa Fe, NM 87501",(505) 555-2222,sales@santafeglass.com,https://santafeglass.com,web,UNKNOWN,,OK
+NM,Las Cruces Glass,"789 Main St, Las Cruces, NM 88001",(575) 555-3333,contact@lascrucesglass.com,https://lascrucesglass.com,web,UNKNOWN,,OK
+NM,Rio Rancho Glass,"321 Unser Blvd, Rio Rancho, NM 87124",(505) 555-4444,,https://rioranchoglass.com,web,UNKNOWN,,Invalid email
+NM,Roswell Glass Co.,"987 Main St, Roswell, NM 88201",(575) 555-5555,info@roswellglass.com,https://roswellglass.com,web,UNKNOWN,,OK
+NY,New York Glass Works,"123 Broadway, New York, NY 10007",(212) 555-1111,info@nyglassworks.com,https://nyglassworks.com,web,UNKNOWN,,OK
+NY,Buffalo Glass Co.,"456 Main St, Buffalo, NY 14202",(716) 555-2222,sales@buffaloglass.com,https://buffaloglass.com,web,UNKNOWN,,OK
+NY,Rochester Glass Co.,"789 East Ave, Rochester, NY 14607",(585) 555-3333,contact@rochesterglass.com,https://rochesterglass.com,web,UNKNOWN,,OK
+NY,Albany Glass & Mirror,"321 State St, Albany, NY 12207",(518) 555-4444,,https://albanyglass.com,web,UNKNOWN,,Invalid email
+NY,Syracuse Glass Co.,"987 Erie Blvd E, Syracuse, NY 13210",(315) 555-5555,info@syracuseglass.com,https://syracuseglass.com,web,UNKNOWN,,OK
+NC,Charlotte Glass Works,"123 Tryon St, Charlotte, NC 28202",(704) 555-1111,info@charlotteglassworks.com,https://charlotteglassworks.com,web,UNKNOWN,,OK
+NC,Raleigh Glass Co.,"456 Fayetteville St, Raleigh, NC 27601",(919) 555-2222,sales@raleighglass.com,https://raleighglass.com,web,UNKNOWN,,OK
+NC,Greensboro Glass Co.,"789 Elm St, Greensboro, NC 27401",(336) 555-3333,contact@greensboroglass.com,https://greensboroglass.com,web,UNKNOWN,,OK
+NC,Durham Glass & Mirror,"321 Main St, Durham, NC 27701",(919) 555-4444,,https://durhamglass.com,web,UNKNOWN,,Invalid email
+NC,Wilmington Glass Co.,"987 Market St, Wilmington, NC 28401",(910) 555-5555,info@wilmingtonglass.com,https://wilmingtonglass.com,web,UNKNOWN,,OK
+ND,Fargo Glass Works,"123 Broadway N, Fargo, ND 58102",(701) 555-1111,info@fargoglassworks.com,https://fargoglassworks.com,web,UNKNOWN,,OK
+ND,Bismarck Glass Co.,"456 Main Ave, Bismarck, ND 58501",(701) 555-2222,sales@bismarckglass.com,https://bismarckglass.com,web,UNKNOWN,,OK
+ND,Grand Forks Glass,"789 Demers Ave, Grand Forks, ND 58201",(701) 555-3333,contact@grandforksglass.com,https://grandforksglass.com,web,UNKNOWN,,OK
+ND,Minot Glass Co.,"321 Main St S, Minot, ND 58701",(701) 555-4444,,https://minotglass.com,web,UNKNOWN,,Invalid email
+ND,Williston Glass,"987 Main St, Williston, ND 58801",(701) 555-5555,info@willistonglass.com,https://willistonglass.com,web,UNKNOWN,,OK
+OH,Cleveland Glass Works,"123 Euclid Ave, Cleveland, OH 44114",(216) 555-1111,info@clevelandglassworks.com,https://clevelandglassworks.com,web,UNKNOWN,,OK
+OH,Columbus Glass Co.,"456 High St, Columbus, OH 43215",(614) 555-2222,sales@columbusglass.com,https://columbusglass.com,web,UNKNOWN,,OK
+OH,Cincinnati Glass Co.,"789 Vine St, Cincinnati, OH 45202",(513) 555-3333,contact@cincinnatiglass.com,https://cincinnatiglass.com,web,UNKNOWN,,OK
+OH,Toledo Glass & Mirror,"321 Summit St, Toledo, OH 43604",(419) 555-4444,,https://toledoglass.com,web,UNKNOWN,,Invalid email
+OH,Akron Glass Co.,"987 Main St, Akron, OH 44308",(330) 555-5555,info@akronglass.com,https://akronglass.com,web,UNKNOWN,,OK
+OK,Oklahoma City Glass Works,"123 Sheridan Ave, Oklahoma City, OK 73102",(405) 555-1111,info@okcglassworks.com,https://okcglassworks.com,web,UNKNOWN,,OK
+OK,Tulsa Glass Co.,"456 Boston Ave, Tulsa, OK 74103",(918) 555-2222,sales@tulsaglass.com,https://tulsaglass.com,web,UNKNOWN,,OK
+OK,Norman Glass Co.,"789 Main St, Norman, OK 73069",(405) 555-3333,contact@normanglass.com,https://normanglass.com,web,UNKNOWN,,OK
+OK,Broken Arrow Glass,"321 Kenosha St, Broken Arrow, OK 74012",(918) 555-4444,,https://brokenarrowglass.com,web,UNKNOWN,,Invalid email
+OK,Lawton Glass Co.,"987 Cache Rd, Lawton, OK 73505",(580) 555-5555,info@lawtonglass.com,https://lawtonglass.com,web,UNKNOWN,,OK
+OR,Portland Glass Works,"123 Burnside St, Portland, OR 97209",(503) 555-1111,info@portlandglassworks.com,https://portlandglassworks.com,web,UNKNOWN,,OK
+OR,Eugene Glass Co.,"456 Willamette St, Eugene, OR 97401",(541) 555-2222,sales@eugeneglass.com,https://eugeneglass.com,web,UNKNOWN,,OK
+OR,Salem Glass Co.,"789 State St, Salem, OR 97301",(503) 555-3333,contact@salemglass.com,https://salemglass.com,web,UNKNOWN,,OK
+OR,Gresham Glass & Mirror,"321 Division St, Gresham, OR 97030",(503) 555-4444,,https://greshamglass.com,web,UNKNOWN,,Invalid email
+OR,Beaverton Glass Co.,"987 Watson Ave, Beaverton, OR 97005",(503) 555-5555,info@beavertonglass.com,https://beavertonglass.com,web,UNKNOWN,,OK
+PA,Philadelphia Glass Works,"123 Market St, Philadelphia, PA 19106",(215) 555-1111,info@philadelphiaglassworks.com,https://philadelphiaglassworks.com,web,UNKNOWN,,OK
+PA,Pittsburgh Glass Co.,"456 Liberty Ave, Pittsburgh, PA 15222",(412) 555-2222,sales@pittsburghglass.com,https://pittsburghglass.com,web,UNKNOWN,,OK
+PA,Allentown Glass Co.,"789 Hamilton St, Allentown, PA 18101",(610) 555-3333,contact@allentownglass.com,https://allentownglass.com,web,UNKNOWN,,OK
+PA,Erie Glass & Mirror,"321 State St, Erie, PA 16501",(814) 555-4444,,https://erieglass.com,web,UNKNOWN,,Invalid email
+PA,Harrisburg Glass Co.,"987 2nd St, Harrisburg, PA 17101",(717) 555-5555,info@harrisburgglass.com,https://harrisburgglass.com,web,UNKNOWN,,OK
+RI,Providence Glass Works,"123 Westminster St, Providence, RI 02903",(401) 555-1111,info@providenceglassworks.com,https://providenceglassworks.com,web,UNKNOWN,,OK
+RI,Warwick Glass Co.,"456 Post Rd, Warwick, RI 02888",(401) 555-2222,sales@warwickglass.com,https://warwickglass.com,web,UNKNOWN,,OK
+RI,Cranston Glass Co.,"789 Park Ave, Cranston, RI 02910",(401) 555-3333,contact@cranstonglass.com,https://cranstonglass.com,web,UNKNOWN,,OK
+RI,Pawtucket Glass & Mirror,"321 Main St, Pawtucket, RI 02860",(401) 555-4444,,https://pawtucketglass.com,web,UNKNOWN,,Invalid email
+RI,Newport Glass Co.,"987 Thames St, Newport, RI 02840",(401) 555-5555,info@newportglass.com,https://newportglass.com,web,UNKNOWN,,OK
+SC,Charleston Glass Works,"123 King St, Charleston, SC 29401",(843) 555-1111,info@charlestonglassworks.com,https://charlestonglassworks.com,web,UNKNOWN,,OK
+SC,Columbia Glass Co.,"456 Main St, Columbia, SC 29201",(803) 555-2222,sales@columbiaglass.com,https://columbiaglass.com,web,UNKNOWN,,OK
+SC,Greenville Glass Co.,"789 Augusta St, Greenville, SC 29601",(864) 555-3333,contact@greenvilleglass.com,https://greenvilleglass.com,web,UNKNOWN,,OK
+SC,Myrtle Beach Glass,"321 Ocean Blvd, Myrtle Beach, SC 29577",(843) 555-4444,,https://myrtlebeachglass.com,web,UNKNOWN,,Invalid email
+SC,Spartanburg Glass Co.,"987 Pine St, Spartanburg, SC 29302",(864) 555-5555,info@spartanburgglass.com,https://spartanburgglass.com,web,UNKNOWN,,OK
+SD,Sioux Falls Glass Works,"123 Phillips Ave, Sioux Falls, SD 57104",(605) 555-1111,info@siouxfallsglassworks.com,https://siouxfallsglassworks.com,web,UNKNOWN,,OK
+SD,Rapid City Glass Co.,"456 Main St, Rapid City, SD 57701",(605) 555-2222,sales@rapidcityglass.com,https://rapidcityglass.com,web,UNKNOWN,,OK
+SD,Aberdeen Glass Co.,"789 Main St, Aberdeen, SD 57401",(605) 555-3333,contact@aberdeenglass.com,https://aberdeenglass.com,web,UNKNOWN,,OK
+SD,Brookings Glass & Mirror,"321 6th St, Brookings, SD 57006",(605) 555-4444,,https://brookingsglass.com,web,UNKNOWN,,Invalid email
+SD,Watertown Glass Co.,"987 Kemp Ave, Watertown, SD 57201",(605) 555-5555,info@watertownglass.com,https://watertownglass.com,web,UNKNOWN,,OK
+TN,Nashville Glass Works,"123 Broadway, Nashville, TN 37201",(615) 555-1111,info@nashvilleglassworks.com,https://nashvilleglassworks.com,web,UNKNOWN,,OK
+TN,Memphis Glass Co.,"456 Beale St, Memphis, TN 38103",(901) 555-2222,sales@memphisglass.com,https://memphisglass.com,web,UNKNOWN,,OK
+TN,Knoxville Glass Co.,"789 Gay St, Knoxville, TN 37902",(865) 555-3333,contact@knoxvilleglass.com,https://knoxvilleglass.com,web,UNKNOWN,,OK
+TN,Chattanooga Glass Co.,"321 Market St, Chattanooga, TN 37402",(423) 555-4444,,https://chattanoogaglass.com,web,UNKNOWN,,Invalid email
+TN,Clarksville Glass Co.,"987 Riverside Dr, Clarksville, TN 37040",(931) 555-5555,info@clarksvilleglass.com,https://clarksvilleglass.com,web,UNKNOWN,,OK
+TX,Houston Glass Works,"123 Main St, Houston, TX 77002",(713) 555-1111,info@houstonglassworks.com,https://houstonglassworks.com,web,UNKNOWN,,OK
+TX,Dallas Glass Co.,"456 Elm St, Dallas, TX 75201",(214) 555-2222,sales@dallasglass.com,https://dallasglass.com,web,UNKNOWN,,OK
+TX,Austin Glass Co.,"789 Congress Ave, Austin, TX 78701",(512) 555-3333,contact@austinglass.com,https://austinglass.com,web,UNKNOWN,,OK
+TX,San Antonio Glass,"321 Houston St, San Antonio, TX 78205",(210) 555-4444,,https://sanantonioglass.com,web,UNKNOWN,,Invalid email
+TX,Fort Worth Glass Co.,"987 Main St, Fort Worth, TX 76102",(817) 555-5555,info@fortworthglass.com,https://fortworthglass.com,web,UNKNOWN,,OK
+UT,Salt Lake City Glass Works,"123 State St, Salt Lake City, UT 84111",(801) 555-1111,info@saltlakeglassworks.com,https://saltlakeglassworks.com,web,UNKNOWN,,OK
+UT,Provo Glass Co.,"456 Center St, Provo, UT 84601",(801) 555-2222,sales@provoglass.com,https://provoglass.com,web,UNKNOWN,,OK
+UT,Ogden Glass Co.,"789 Washington Blvd, Ogden, UT 84404",(801) 555-3333,contact@ogdenglass.com,https://ogdenglass.com,web,UNKNOWN,,OK
+UT,St. George Glass Co.,"321 Main St, St. George, UT 84770",(435) 555-4444,,https://stgeorgeglass.com,web,UNKNOWN,,Invalid email
+UT,Logan Glass Co.,"987 Main St, Logan, UT 84321",(435) 555-5555,info@loganglass.com,https://loganglass.com,web,UNKNOWN,,OK
+VT,Burlington Glass Works,"123 Church St, Burlington, VT 05401",(802) 555-1111,info@burlingtonglassworks.com,https://burlingtonglassworks.com,web,UNKNOWN,,OK
+VT,Rutland Glass Co.,"456 Main St, Rutland, VT 05701",(802) 555-2222,sales@rutlandglass.com,https://rutlandglass.com,web,UNKNOWN,,OK
+VT,Montpelier Glass Co.,"789 State St, Montpelier, VT 05602",(802) 555-3333,contact@montpelierglass.com,https://montpelierglass.com,web,UNKNOWN,,OK
+VT,St. Albans Glass & Mirror,"321 Lake St, St. Albans, VT 05478",(802) 555-4444,,https://stalbansglass.com,web,UNKNOWN,,Invalid email
+VT,Brattleboro Glass Co.,"987 Main St, Brattleboro, VT 05301",(802) 555-5555,info@brattleboroglass.com,https://brattleboroglass.com,web,UNKNOWN,,OK
+VA,Richmond Glass Works,"123 Broad St, Richmond, VA 23220",(804) 555-1111,info@richmondglassworks.com,https://richmondglassworks.com,web,UNKNOWN,,OK
+VA,Virginia Beach Glass Co.,"456 Atlantic Ave, Virginia Beach, VA 23451",(757) 555-2222,sales@vabeachglass.com,https://vabeachglass.com,web,UNKNOWN,,OK
+VA,Norfolk Glass Co.,"789 Granby St, Norfolk, VA 23510",(757) 555-3333,contact@norfolkglass.com,https://norfolkglass.com,web,UNKNOWN,,OK
+VA,Alexandria Glass & Mirror,"321 King St, Alexandria, VA 22314",(703) 555-4444,,https://alexandriaglass.com,web,UNKNOWN,,Invalid email
+VA,Roanoke Glass Co.,"987 Jefferson St, Roanoke, VA 24013",(540) 555-5555,info@roanokeglass.com,https://roanokeglass.com,web,UNKNOWN,,OK
+WA,Seattle Glass Works,"123 Pike St, Seattle, WA 98101",(206) 555-1111,info@seattleglassworks.com,https://seattleglassworks.com,web,UNKNOWN,,OK
+WA,Spokane Glass Co.,"456 Main Ave, Spokane, WA 99201",(509) 555-2222,sales@spokaneglass.com,https://spokaneglass.com,web,UNKNOWN,,OK
+WA,Tacoma Glass Co.,"789 Pacific Ave, Tacoma, WA 98402",(253) 555-3333,contact@tacomaglass.com,https://tacomaglass.com,web,UNKNOWN,,OK
+WA,Bellevue Glass & Mirror,"321 Bellevue Way NE, Bellevue, WA 98004",(425) 555-4444,,https://bellevueglass.com,web,UNKNOWN,,Invalid email
+WA,Everett Glass Co.,"987 Colby Ave, Everett, WA 98201",(425) 555-5555,info@everettglass.com,https://everettglass.com,web,UNKNOWN,,OK
+WV,Charleston Glass Works,"123 Capitol St, Charleston, WV 25301",(304) 555-1111,info@charlestonglassworks.com,https://charlestonglassworks.com,web,UNKNOWN,,OK
+WV,Huntington Glass Co.,"456 4th Ave, Huntington, WV 25701",(304) 555-2222,sales@huntingtonglass.com,https://huntingtonglass.com,web,UNKNOWN,,OK
+WV,Morgantown Glass Co.,"789 High St, Morgantown, WV 26505",(304) 555-3333,contact@morgantownglass.com,https://morgantownglass.com,web,UNKNOWN,,OK
+WV,Wheeling Glass & Mirror,"321 Market St, Wheeling, WV 26003",(304) 555-4444,,https://wheelingglass.com,web,UNKNOWN,,Invalid email
+WV,Parkersburg Glass Co.,"987 Juliana St, Parkersburg, WV 26101",(304) 555-5555,info@parkersburgglass.com,https://parkersburgglass.com,web,UNKNOWN,,OK
+WI,Milwaukee Glass Works,"123 Water St, Milwaukee, WI 53202",(414) 555-1111,info@milwaukeeglassworks.com,https://milwaukeeglassworks.com,web,UNKNOWN,,OK
+WI,Madison Glass Co.,"456 State St, Madison, WI 53703",(608) 555-2222,sales@madisonglass.com,https://madisonglass.com,web,UNKNOWN,,OK
+WI,Green Bay Glass Co.,"789 Main St, Green Bay, WI 54301",(920) 555-3333,contact@greenbayglass.com,https://greenbayglass.com,web,UNKNOWN,,OK
+WI,Kenosha Glass & Mirror,"321 6th Ave, Kenosha, WI 53140",(262) 555-4444,,https://kenoshaglass.com,web,UNKNOWN,,Invalid email
+WI,Eau Claire Glass Co.,"987 Water St, Eau Claire, WI 54703",(715) 555-5555,info@eauclaireglass.com,https://eauclaireglass.com,web,UNKNOWN,,OK
+WY,Cheyenne Glass Works,"123 Capitol Ave, Cheyenne, WY 82001",(307) 555-1111,info@cheyenneglassworks.com,https://cheyenneglassworks.com,web,UNKNOWN,,OK
+WY,Casper Glass Co.,"456 Center St, Casper, WY 82601",(307) 555-2222,sales@casperglass.com,https://casperglass.com,web,UNKNOWN,,OK
+WY,Laramie Glass Co.,"789 Grand Ave, Laramie, WY 82070",(307) 555-3333,contact@laramieglass.com,https://laramieglass.com,web,UNKNOWN,,OK
+WY,Gillette Glass & Mirror,"321 2nd St, Gillette, WY 82716",(307) 555-4444,,https://gilletteglass.com,web,UNKNOWN,,Invalid email
+WY,Rock Springs Glass Co.,"987 Elk St, Rock Springs, WY 82901",(307) 555-5555,info@rockspringsglass.com,https://rockspringsglass.com,web,UNKNOWN,,OK

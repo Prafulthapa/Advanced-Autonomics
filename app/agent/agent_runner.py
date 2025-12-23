@@ -1,0 +1,252 @@
+"""
+Main AI Agent Runner
+Autonomous agent that manages email outreach
+FIXED: Removed circular import with worker.tasks
+"""
+
+from sqlalchemy.orm import Session
+from datetime import datetime
+import logging
+import uuid
+import time
+
+from app.database import SessionLocal
+from app.models.agent_config import AgentConfig
+from app.models.agent_action_log import AgentActionLog
+from app.agent.decision_engine import DecisionEngine, DecisionType
+from app.agent.safety_controller import SafetyController
+from app.agent.state_manager import StateManager
+from app.utils.rate_limiter import RateLimiter
+# REMOVED: from app.worker.tasks import generate_and_send_email_task  # ← Circular import!
+
+logger = logging.getLogger(__name__)
+
+
+class AgentRunner:
+    """Main autonomous agent controller."""
+    
+    def __init__(self):
+        self.run_id = str(uuid.uuid4())[:8]  # Unique ID for this run
+        self.db: Session = SessionLocal()
+        self.decision_engine = DecisionEngine(self.db)
+        
+        logger.info(f"🤖 Agent initialized [run_id: {self.run_id}]")
+    
+    def __del__(self):
+        """Cleanup."""
+        if hasattr(self, 'db'):
+            self.db.close()
+    
+    def is_agent_enabled(self) -> bool:
+        """Check if agent should be running."""
+        config = self.db.query(AgentConfig).first()
+        if not config:
+            logger.error("❌ Agent config not found")
+            return False
+        
+        return config.is_running and not config.is_paused
+    
+    def run_cycle(self) -> dict:
+        """
+        Run one complete agent cycle.
+        
+        Returns:
+            Dictionary with cycle results
+        """
+        start_time = time.time()
+        self.run_id = str(uuid.uuid4())[:8]
+        
+        logger.info(f"🚀 Agent cycle starting [run_id: {self.run_id}]")
+        
+        results = {
+            "run_id": self.run_id,
+            "started_at": datetime.utcnow().isoformat(),
+            "decisions_made": 0,
+            "emails_queued": 0,
+            "leads_skipped": 0,
+            "errors": 0,
+            "status": "running"
+        }
+        
+        try:
+            # Step 1: Check if agent should run
+            if not self.is_agent_enabled():
+                logger.warning("⏸️  Agent is disabled, skipping cycle")
+                results["status"] = "disabled"
+                return results
+            
+            # Step 2: Safety checks
+            can_send, safety_reason = SafetyController.can_send_now(self.db)
+            if not can_send:
+                logger.warning(f"⚠️  Safety check failed: {safety_reason}")
+                results["status"] = "blocked"
+                results["block_reason"] = safety_reason
+                return results
+            
+            # Step 3: Get rate limit capacity
+            capacity = RateLimiter.get_remaining_capacity(self.db)
+            max_sends = min(
+                capacity['daily']['remaining'],
+                capacity['hourly']['remaining'],
+                20  # Never queue more than 20 at once
+            )
+            
+            logger.info(f"📊 Rate limits: {capacity['daily']['sent']}/{capacity['daily']['limit']} daily, "
+                       f"{capacity['hourly']['sent']}/{capacity['hourly']['limit']} hourly")
+            
+            if max_sends <= 0:
+                logger.info("⏸️  Rate limits reached, waiting...")
+                results["status"] = "rate_limited"
+                return results
+            
+            # Step 4: Get decisions from decision engine
+            logger.info(f"🧠 Consulting decision engine (max actions: {max_sends})...")
+            decisions = self.decision_engine.make_decisions(max_actions=max_sends)
+            results["decisions_made"] = len(decisions)
+            
+            if not decisions:
+                logger.info("✅ No actions needed this cycle")
+                results["status"] = "idle"
+                return results
+            
+            # Step 5: Execute decisions
+            logger.info(f"⚡ Executing {len(decisions)} decisions...")
+            for decision in decisions:
+                try:
+                    if decision.action == DecisionType.SEND_INITIAL:
+                        self._execute_send_initial(decision)
+                        results["emails_queued"] += 1
+                    
+                    elif decision.action == DecisionType.SEND_FOLLOWUP:
+                        self._execute_send_followup(decision)
+                        results["emails_queued"] += 1
+                    
+                    elif decision.action == DecisionType.SKIP:
+                        results["leads_skipped"] += 1
+                    
+                    # Log the decision
+                    self._log_action(decision, "success")
+                    
+                except Exception as e:
+                    logger.error(f"❌ Error executing decision for lead {decision.lead.id}: {str(e)}")
+                    results["errors"] += 1
+                    self._log_action(decision, "error", str(e))
+                    
+                    # Handle error on lead
+                    StateManager.handle_error(decision.lead, str(e), self.db)
+            
+            # Step 6: Update agent config
+            config = self.db.query(AgentConfig).first()
+            if config:
+                config.last_agent_run_at = datetime.utcnow()
+                self.db.commit()
+            
+            results["status"] = "completed"
+            
+        except Exception as e:
+            logger.error(f"💥 Agent cycle failed: {str(e)}", exc_info=True)
+            results["status"] = "failed"
+            results["error"] = str(e)
+        
+        finally:
+            execution_time = (time.time() - start_time) * 1000
+            results["execution_time_ms"] = int(execution_time)
+            results["completed_at"] = datetime.utcnow().isoformat()
+            
+            logger.info(f"✅ Agent cycle completed in {execution_time:.0f}ms [run_id: {self.run_id}]")
+            logger.info(f"📈 Results: {results['emails_queued']} queued, "
+                       f"{results['leads_skipped']} skipped, {results['errors']} errors")
+        
+        return results
+    
+    def _execute_send_initial(self, decision):
+        """Execute initial email send."""
+        # Import here to avoid circular import
+        from app.worker.tasks import generate_and_send_email_task
+        
+        lead = decision.lead
+        
+        logger.info(f"📧 Queuing initial email for lead {lead.id} ({lead.email})")
+        
+        # Queue email generation + sending task
+        task = generate_and_send_email_task.delay(lead.id)
+        
+        # Update lead state
+        StateManager.transition_to_contacted(lead, self.db)
+        
+        # Increment rate limit counters
+        RateLimiter.increment_counters(self.db)
+        
+        logger.info(f"✅ Initial email queued [task_id: {task.id}]")
+    
+    def _execute_send_followup(self, decision):
+        """Execute follow-up email send."""
+        # Import here to avoid circular import
+        from app.worker.tasks import generate_and_send_email_task
+        
+        lead = decision.lead
+        
+        logger.info(f"📧 Queuing follow-up #{lead.follow_up_count + 1} for lead {lead.id}")
+        
+        # Queue email task
+        task = generate_and_send_email_task.delay(lead.id)
+        
+        # Update lead state
+        StateManager.transition_to_follow_up(lead, self.db)
+        
+        # Increment counters
+        RateLimiter.increment_counters(self.db)
+        
+        logger.info(f"✅ Follow-up queued [task_id: {task.id}]")
+    
+    def _log_action(self, decision, result: str, error: str = None):
+        """Log agent action to database."""
+        try:
+            config = self.db.query(AgentConfig).first()
+            
+            log = AgentActionLog(
+                action_type=decision.action,
+                action_result=result,
+                lead_id=decision.lead.id,
+                lead_email=decision.lead.email,
+                decision_reason=decision.reason,
+                error_message=error,
+                agent_run_id=self.run_id,
+                emails_sent_before=config.emails_sent_today if config else 0
+            )
+            self.db.add(log)
+            self.db.commit()
+        except Exception as e:
+            logger.error(f"Failed to log action: {str(e)}")
+    
+    def get_status(self) -> dict:
+        """Get current agent status."""
+        config = self.db.query(AgentConfig).first()
+        
+        if not config:
+            return {"error": "Config not found"}
+        
+        capacity = RateLimiter.get_remaining_capacity(self.db)
+        
+        return {
+            "is_running": config.is_running,
+            "is_paused": config.is_paused,
+            "last_run": config.last_agent_run_at.isoformat() if config.last_agent_run_at else None,
+            "emails_today": capacity['daily']['sent'],
+            "daily_limit": capacity['daily']['limit'],
+            "emails_this_hour": capacity['hourly']['sent'],
+            "hourly_limit": capacity['hourly']['limit'],
+            "total_emails": config.total_emails_sent,
+            "total_errors": config.total_errors
+        }
+
+
+# Singleton instance
+_agent_instance = None
+
+def get_agent() -> AgentRunner:
+    """Get or create agent instance."""
+    global _agent_instance
+    if _agent_instance is None:
+        _agent_instance = AgentRunner()
+    return _agent_instance

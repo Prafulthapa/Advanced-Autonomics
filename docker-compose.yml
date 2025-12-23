@@ -1,0 +1,92 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.api
+    container_name: api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./agent_config.yaml:/app/agent_config.yaml
+    env_file:
+      - .env
+    environment:
+      - AGENT_ENABLED=true
+      - AGENT_CHECK_INTERVAL=5
+    depends_on:
+      - redis
+      - ollama
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.worker
+    container_name: worker
+    # FIXED: Changed from app.worker.tasks to app.worker.celery_app
+    command: celery -A app.worker.celery_app worker --loglevel=info --queues=emails,agent,replies
+    volumes:
+      - ./data:/app/data
+      - ./agent_config.yaml:/app/agent_config.yaml
+    env_file:
+      - .env
+    environment:
+      - AGENT_ENABLED=true
+    depends_on:
+      - redis
+      - ollama
+    restart: unless-stopped
+
+  beat:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.worker
+    container_name: beat
+    command: celery -A app.worker.celery_app beat --loglevel=info
+    volumes:
+      - ./data:/app/data
+      - ./agent_config.yaml:/app/agent_config.yaml
+    env_file:
+      - .env
+    environment:
+      - AGENT_ENABLED=true
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Pre-pull model on startup
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        /bin/ollama serve &
+        sleep 5
+        ollama pull llama3.2:3b
+        wait
+
+volumes:
+  ollama:
+  redis-data:

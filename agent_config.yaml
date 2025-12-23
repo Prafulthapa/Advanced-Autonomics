@@ -1,0 +1,104 @@
+# AI Agent Configuration
+# Advanced Autonomics Email Outreach System
+
+agent:
+  # Main control
+  enabled: true
+  auto_start_on_boot: false  # Should agent start automatically when system starts?
+  
+  # Check intervals (minutes)
+  check_interval: 5  # How often agent reviews all leads
+  inbox_check_interval: 15  # How often to check for replies
+
+# Rate limiting and safety
+limits:
+  # Daily limits
+  max_emails_per_day: 2000
+  
+  # Hourly limits (prevents bursts)
+  max_emails_per_hour: 60
+  
+  # Per-lead limits
+  max_follow_ups_per_lead: 3
+  days_between_followups: 3
+  
+  # Error handling
+  max_consecutive_errors: 5  # Pause agent after N errors in a row
+  error_rate_threshold_percent: 10  # Pause if error rate exceeds this
+
+# Timing and scheduling
+timing:
+  # Business hours (agent only sends during these times)
+  business_hours_start: "09:00"
+  business_hours_end: "17:00"
+  timezone: "America/New_York"
+  
+  # Days of week (1 = Monday, 7 = Sunday)
+  active_days:
+    - 1  # Monday
+    - 2  # Tuesday
+    - 3  # Wednesday
+    - 4  # Thursday
+    - 5  # Friday
+  
+  # Wait times
+  min_delay_between_emails_seconds: 30  # Throttle to avoid spam filters
+  warmup_delay_minutes: 2  # Wait after agent starts before first email
+
+# Safety controls
+safety:
+  respect_business_hours: false
+  respect_unsubscribes: true
+  pause_on_high_error_rate: true
+  require_human_review_after_days: 30  # Flag leads with no response after 30 days
+  
+  # Prevent accidental spam
+  confirm_before_bulk_send: true  # Ask before sending to 10+ leads at once
+  max_bulk_send_size: 20
+
+# AI decision-making
+ai:
+  use_ai_for_timing: false  # Let AI decide optimal send times (experimental)
+  use_ai_for_priority: false  # Let AI score lead priority (experimental)
+  ai_confidence_threshold: 0.7  # Only take AI suggestions if confidence > 70%
+
+# Lead prioritization
+priority:
+  # Scoring factors (weight 0-10)
+  recent_engagement_weight: 8
+  industry_match_weight: 6
+  company_size_weight: 4
+  reply_history_weight: 10
+
+# Monitoring and alerts
+monitoring:
+  log_all_decisions: true  # Log every agent decision for debugging
+  log_retention_days: 90  # Keep logs for 90 days
+  
+  # Alert thresholds
+  alert_on_zero_sends_hours: 4  # Alert if no emails sent in 4 hours
+  alert_on_high_errors: true
+
+# Sequences and follow-ups
+sequences:
+  initial_email:
+    wait_days: 0  # Send immediately
+    
+  follow_up_1:
+    wait_days: 3
+    only_if_no_reply: true
+    
+  follow_up_2:
+    wait_days: 7  # 7 days after previous email
+    only_if_no_reply: true
+    
+  follow_up_3:
+    wait_days: 14
+    only_if_no_reply: true
+    max_step: true  # Don't go beyond this
+
+# Advanced features (experimental)
+experimental:
+  enable_ai_content_optimization: false
+  enable_send_time_optimization: false
+  enable_dynamic_follow_up_intervals: false
