@@ -1,352 +1,368 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
-import json
 import asyncio
+from celery.exceptions import MaxRetriesExceededError
 
-# CRITICAL FIX: Import the celery_app from celery_app.py instead of creating a new one
 from app.worker.celery_app import celery_app
-
 from app.database import SessionLocal
 from app.models.lead import Lead
 from app.models.email_log import EmailLog
+from app.models.email_queue import EmailQueue  # ✅ NEW
+
 from app.services.email_service import EmailService
 from app.services.ollama_service import OllamaService
-from app.services.email_templates import get_template_for_industry, get_subject_for_industry
+
+from app.services.email_templates import (
+    get_template_for_industry,
+    get_subject_for_industry
+)
 
 logger = logging.getLogger(__name__)
 
-# NO LONGER CREATE A NEW CELERY APP HERE!
-# The celery_app is imported from celery_app.py
+# ============================================
+# ✅ TASK 2.3: RETRY LOGIC
+# ============================================
 
-
-@celery_app.task(name="send_email_task")
-def send_email_task(lead_id: int, subject: str, body: str):
-    """Celery task to send an email asynchronously."""
+@celery_app.task(
+    name="generate_and_send_email_task",
+    bind=True,  # ✅ Required for self.retry()
+    max_retries=3,  # ✅ Maximum 3 retry attempts
+    default_retry_delay=300,  # ✅ Wait 5 minutes between retries
+    autoretry_for=(Exception,),  # ✅ Auto-retry on any exception
+    retry_backoff=True,  # ✅ Exponential backoff (5min, 10min, 20min)
+    retry_backoff_max=3600,  # ✅ Max backoff: 1 hour
+    retry_jitter=True  # ✅ Add randomness to prevent thundering herd
+)
+def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
+    """
+    Generate and send professional HTML email with embedded images
+    and AI-generated plain-text fallback.
+    
+    ✅ NEW: Includes retry logic and queue persistence
+    """
     db: Session = SessionLocal()
+    queue_record = None
 
     try:
-        logger.info(f"Starting email task for lead_id={lead_id}")
+        logger.info(f"🚀 Starting generate+send task for lead_id={lead_id} (attempt {self.request.retries + 1}/4)")
 
+        # ============================================
+        # ✅ TASK 2.4: LOAD FROM QUEUE TABLE
+        # ============================================
+        if queue_id:
+            queue_record = db.query(EmailQueue).filter(EmailQueue.id == queue_id).first()
+            if queue_record:
+                queue_record.status = "processing"
+                queue_record.task_id = self.request.id
+                queue_record.retry_count = self.request.retries
+                db.commit()
+
+        # Fetch lead
         lead = db.query(Lead).filter(Lead.id == lead_id).first()
         if not lead:
-            logger.error(f"Lead {lead_id} not found")
+            logger.error(f"❌ Lead {lead_id} not found")
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = "Lead not found"
+                queue_record.failed_at = datetime.utcnow()
+                db.commit()
             return {"success": False, "error": "Lead not found"}
 
-        # Send email
-        to_name = f"{lead.first_name} {lead.last_name}".strip()
-        if not to_name or to_name == "UNKNOWN None":
-            to_name = None
-
-        success, error = EmailService.send_email(
-            to_email=lead.email,
-            subject=subject,
-            body=body,
-            to_name=to_name
+        # Prepare lead data
+        first_name = (
+            lead.first_name
+            if lead.first_name and lead.first_name not in ["UNKNOWN", "None"]
+            else ""
         )
-
-        # Log email to database
-        email_log = EmailLog(
-            lead_id=lead_id,
-            subject=subject,
-            body=body,
-            status="sent" if success else "failed",
-            error_message=error,
-            sent_at=datetime.utcnow()
+        last_name = (
+            lead.last_name
+            if lead.last_name and lead.last_name not in ["UNKNOWN", "None"]
+            else ""
         )
-        db.add(email_log)
+        company = lead.company or "your company"
 
-        # Update lead
-        if success:
-            lead.last_email_sent_at = datetime.utcnow()
-            lead.status = "contacted"
-            lead.sequence_step += 1
+        # -----------------------------
+        # Generate HTML email
+        # -----------------------------
+        from app.services.html_email_templates_professional import get_full_professional_template
 
-        db.commit()
-
-        logger.info(f"Email task completed for lead_id={lead_id}, success={success}")
-
-        return {
-            "success": success,
-            "error": error,
-            "lead_id": lead_id,
-            "email_log_id": email_log.id
-        }
-
-    except Exception as e:
-        logger.error(f"Error in send_email_task: {str(e)}", exc_info=True)
-        db.rollback()
-        return {"success": False, "error": str(e)}
-
-    finally:
-        db.close()
-
-
-@celery_app.task(name="generate_and_send_email_task")
-def generate_and_send_email_task(lead_id: int):
-    """Celery task to generate email with AI using industry templates and send it."""
-    db: Session = SessionLocal()
-
-    try:
-        logger.info(f"Starting generate+send task for lead_id={lead_id}")
-
-        # Get lead
-        lead = db.query(Lead).filter(Lead.id == lead_id).first()
-        if not lead:
-            logger.error(f"Lead {lead_id} not found")
-            return {"success": False, "error": "Lead not found"}
-
-        # Get industry-specific template
-        template = get_template_for_industry(lead.industry)
-
-        # Handle UNKNOWN or missing names
-        first_name = lead.first_name if lead.first_name and lead.first_name != "UNKNOWN" else ""
-        last_name = lead.last_name if lead.last_name and lead.last_name != "None" else ""
-
-        # Format the template with lead data
-        prompt = template.format(
-            first_name=first_name or "there",
-            last_name=last_name,
-            company=lead.company or "your company",
+        html_body, images = get_full_professional_template(
+            first_name=first_name,
+            company=company,
             email=lead.email
         )
 
-        # Generate email with AI
+        # -----------------------------
+        # Generate plain-text fallback using AI
+        # -----------------------------
+        template = get_template_for_industry(lead.industry)
+        prompt = template.format(
+            first_name=first_name or "there",
+            last_name=last_name,
+            company=company,
+            email=lead.email
+        )
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-        email_body = loop.run_until_complete(OllamaService.generate_email(prompt))
+        plain_text_body = loop.run_until_complete(
+            OllamaService.generate_email(prompt)
+        )
 
-        # Get industry-specific subject line
+        # -----------------------------
+        # Subject line
+        # -----------------------------
         subject = get_subject_for_industry(lead.industry, lead.company)
 
+        # -----------------------------
+        # Inject unsubscribe link
+        # -----------------------------
+        unsubscribe_link = (
+            f"http://localhost:8000/unsubscribe?email={lead.email}"
+        )
+        html_body = html_body.replace(
+            "{{{{UNSUBSCRIBE_LINK}}}}",
+            unsubscribe_link
+        )
+
+        # -----------------------------
         # Send email
-        to_name = f"{first_name} {last_name}".strip()
-        if not to_name:
-            to_name = None
+        # -----------------------------
+        to_name = f"{first_name} {last_name}".strip() or None
 
         success, error = EmailService.send_email(
             to_email=lead.email,
             subject=subject,
-            body=email_body,
-            to_name=to_name
+            body=plain_text_body,   # Plain text fallback
+            to_name=to_name,
+            html_body=html_body,    # HTML version
+            images=images           # Embedded images
         )
 
+        # -----------------------------
         # Log email
+        # -----------------------------
         email_log = EmailLog(
             lead_id=lead_id,
             subject=subject,
-            body=email_body,
+            body=plain_text_body,
             status="sent" if success else "failed",
             error_message=error,
             sent_at=datetime.utcnow()
         )
         db.add(email_log)
 
-        # Update lead
+        # -----------------------------
+        # Update lead state
+        # -----------------------------
         if success:
             lead.last_email_sent_at = datetime.utcnow()
-            lead.status = "contacted"
-            lead.sequence_step = 1
+            lead.status = "contacted" if lead.sequence_step == 0 else "follow_up"
+            lead.sequence_step += 1
+            
+            # ✅ Update queue record
+            if queue_record:
+                queue_record.status = "sent"
+                queue_record.sent_at = datetime.utcnow()
+        else:
+            # ✅ Update queue record with error
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = error
+                queue_record.failed_at = datetime.utcnow()
 
         db.commit()
 
-        logger.info(f"Generate+send task completed for lead_id={lead_id}, success={success}")
+        logger.info(
+            f"✅ Email task completed for lead_id={lead_id}, success={success}"
+        )
 
         return {
             "success": success,
             "error": error,
             "lead_id": lead_id,
             "email_log_id": email_log.id,
-            "generated_email": email_body
+            "email_type": "professional_html",
+            "retry_count": self.request.retries
         }
 
     except Exception as e:
-        logger.error(f"Error in generate_and_send_email_task: {str(e)}", exc_info=True)
-        db.rollback()
-        return {"success": False, "error": str(e)}
-
-    finally:
-        db.close()
-
-
-# ============================================
-# AGENT AUTOMATION TASKS
-# ============================================
-
-@celery_app.task(name="agent_cycle_task")
-def agent_cycle_task():
-    """
-    Main agent cycle - processes leads and sends emails.
-    Runs every 5 minutes via Celery Beat.
-    """
-    from app.models.agent_config import AgentConfig
-    from app.models.agent_action_log import AgentActionLog
-
-    db = SessionLocal()
-    try:
-        logger.info("🤖 Starting agent cycle...")
-
-        # Get agent config
-        config = db.query(AgentConfig).first()
-        if not config:
-            logger.error("❌ No agent config found")
-            return {"status": "error", "message": "No agent config"}
-
-        # Check if agent is running
-        if not config.is_running:
-            logger.info("⏸️ Agent is not running")
-            return {"status": "skipped", "message": "Agent not running"}
-
-        if config.is_paused:
-            logger.info("⏸️ Agent is paused")
-            return {"status": "skipped", "message": "Agent paused"}
-
-        # Log cycle start
-        action_log = AgentActionLog(
-            action_type="cycle_start",
-            action_result="started",
-            decision_reason="Agent cycle initiated",
-            agent_run_id="cycle",
-            emails_sent_before=config.emails_sent_today
+        logger.error(
+            f"❌ Error in generate_and_send_email_task (attempt {self.request.retries + 1}): {str(e)}",
+            exc_info=True
         )
-        db.add(action_log)
-        db.commit()
-
-        # Get leads that need contact (new or interested)
-        leads_to_contact = db.query(Lead).filter(
-            Lead.status.in_(['new', 'replied', 'interested'])
-        ).limit(10).all()
-
-        queued = 0
-        errors = 0
-
-        for lead in leads_to_contact:
-            try:
-                # Check rate limits
-                if config.emails_sent_this_hour >= config.hourly_email_limit:
-                    logger.info(f"⏸️ Hourly limit reached: {config.emails_sent_this_hour}/{config.hourly_email_limit}")
-                    break
-
-                if config.emails_sent_today >= config.daily_email_limit:
-                    logger.info(f"⏸️ Daily limit reached: {config.emails_sent_today}/{config.daily_email_limit}")
-                    break
-
-                # Queue email task
-                logger.info(f"📧 Queuing email for lead {lead.id}: {lead.email}")
-                generate_and_send_email_task.delay(lead.id)
-                queued += 1
-
-            except Exception as e:
-                logger.error(f"❌ Error queuing lead {lead.id}: {e}")
-                errors += 1
-
-        # Update agent status
-        config.last_agent_run_at = datetime.utcnow()
-        db.commit()
-
-        # Log cycle complete
-        result = {
-            "status": "success",
-            "queued": queued,
-            "errors": errors,
-            "skipped": len(leads_to_contact) - queued - errors
-        }
-
-        action_log = AgentActionLog(
-            action_type="cycle_complete",
-            action_result="success",
-            decision_reason=f"Cycle completed: {queued} emails queued",
-            action_metadata=json.dumps(result),
-            agent_run_id="cycle",
-            emails_sent_before=config.emails_sent_today
-        )
-        db.add(action_log)
-        db.commit()
-
-        logger.info(f"✅ Agent cycle complete: {result}")
-        return result
-
-    except Exception as e:
-        error_msg = f"Agent cycle error: {str(e)}"
-        logger.error(f"❌ {error_msg}", exc_info=True)
-
-        # Log error
-        try:
-            action_log = AgentActionLog(
-                action_type="cycle_error",
-                action_result="error",
-                error_message=error_msg,
-                agent_run_id="cycle",
-                emails_sent_before=0
-            )
-            db.add(action_log)
+        
+        # ✅ Update queue record with error
+        if queue_record:
+            queue_record.last_error = str(e)
+            queue_record.retry_count = self.request.retries + 1
             db.commit()
-        except:
-            pass
+        
+        db.rollback()
+        
+        # ✅ RETRY LOGIC: Retry with exponential backoff
+        try:
+            # Calculate retry delay: 5min, 10min, 20min
+            retry_delay = 300 * (2 ** self.request.retries)  # Exponential backoff
+            
+            logger.warning(
+                f"⚠️ Retrying in {retry_delay}s (attempt {self.request.retries + 2}/4)"
+            )
+            
+            raise self.retry(exc=e, countdown=retry_delay)
+            
+        except MaxRetriesExceededError:
+            logger.error(f"🚨 Max retries exceeded for lead_id={lead_id}")
+            
+            # ✅ Mark as permanently failed
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = f"Max retries exceeded: {str(e)}"
+                queue_record.failed_at = datetime.utcnow()
+                db.commit()
+            
+            return {"success": False, "error": "Max retries exceeded", "exception": str(e)}
 
-        return {"status": "error", "message": str(e)}
     finally:
         db.close()
 
 
-@celery_app.task(name="agent_health_check")
-def agent_health_check():
+@celery_app.task(
+    name="send_email_task",
+    bind=True,  # ✅ Required for self.retry()
+    max_retries=3,
+    default_retry_delay=300,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_backoff_max=3600,
+    retry_jitter=True
+)
+def send_email_task(
+    self,
+    lead_id: int,
+    subject: str,
+    body: str,
+    html_body: str = None,
+    queue_id: int = None
+):
     """
-    Health check task - monitors agent status.
-    Runs every minute via Celery Beat.
+    Backward-compatible email sender with retry logic.
     """
-    from app.models.agent_config import AgentConfig
+    db: Session = SessionLocal()
+    queue_record = None
 
-    db = SessionLocal()
     try:
-        config = db.query(AgentConfig).first()
-        if not config:
-            return {"status": "error", "message": "No config"}
+        logger.info(f"🚀 Starting email task for lead_id={lead_id} (attempt {self.request.retries + 1}/4)")
 
-        # Reset hourly counter if needed
-        now = datetime.utcnow()
-        if config.last_hour_reset:
-            hours_diff = (now - config.last_hour_reset).total_seconds() / 3600
-            if hours_diff >= 1:
-                logger.info(f"🔄 Resetting hourly counter (was {config.emails_sent_this_hour})")
-                config.emails_sent_this_hour = 0
-                config.last_hour_reset = now
+        # ✅ Load from queue if provided
+        if queue_id:
+            queue_record = db.query(EmailQueue).filter(EmailQueue.id == queue_id).first()
+            if queue_record:
+                queue_record.status = "processing"
+                queue_record.task_id = self.request.id
+                queue_record.retry_count = self.request.retries
                 db.commit()
 
-        # Reset daily counter if needed
-        if config.last_reset_date:
-            try:
-                last_reset = datetime.strptime(config.last_reset_date, "%Y-%m-%d").date()
-                if now.date() > last_reset:
-                    logger.info(f"🔄 Resetting daily counter (was {config.emails_sent_today})")
-                    config.emails_sent_today = 0
-                    config.last_reset_date = now.strftime("%Y-%m-%d")
-                    db.commit()
-            except:
-                pass
+        lead = db.query(Lead).filter(Lead.id == lead_id).first()
+        if not lead:
+            logger.error(f"❌ Lead {lead_id} not found")
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = "Lead not found"
+                queue_record.failed_at = datetime.utcnow()
+                db.commit()
+            return {"success": False, "error": "Lead not found"}
 
-        health_status = {
-            "status": "healthy",
-            "is_running": config.is_running,
-            "is_paused": config.is_paused,
-            "emails_sent_today": config.emails_sent_today,
-            "emails_sent_this_hour": config.emails_sent_this_hour,
-            "daily_limit": config.daily_email_limit,
-            "hourly_limit": config.hourly_email_limit,
+        to_name = f"{lead.first_name} {lead.last_name}".strip()
+        if not to_name or to_name in ["UNKNOWN None", "None None"]:
+            to_name = None
+
+        images = None
+        if html_body:
+            images = {
+                "company_logo": "app/static/images/logo.png"
+            }
+
+        success, error = EmailService.send_email(
+            to_email=lead.email,
+            subject=subject,
+            body=body,
+            to_name=to_name,
+            html_body=html_body,
+            images=images
+        )
+
+        email_log = EmailLog(
+            lead_id=lead_id,
+            subject=subject,
+            body=body,
+            status="sent" if success else "failed",
+            error_message=error,
+            sent_at=datetime.utcnow()
+        )
+        db.add(email_log)
+
+        if success:
+            lead.last_email_sent_at = datetime.utcnow()
+            lead.status = "contacted"
+            lead.sequence_step += 1
+            
+            if queue_record:
+                queue_record.status = "sent"
+                queue_record.sent_at = datetime.utcnow()
+        else:
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = error
+                queue_record.failed_at = datetime.utcnow()
+
+        db.commit()
+
+        logger.info(
+            f"✅ Email task completed for lead_id={lead_id}, success={success}"
+        )
+
+        return {
+            "success": success,
+            "error": error,
+            "lead_id": lead_id,
+            "email_log_id": email_log.id,
+            "retry_count": self.request.retries
         }
 
-        logger.info(f"💓 Health check: {health_status}")
-        return health_status
-
     except Exception as e:
-        logger.error(f"❌ Health check error: {e}")
-        return {"status": "error", "message": str(e)}
+        logger.error(
+            f"❌ Error in send_email_task: {str(e)}",
+            exc_info=True
+        )
+        
+        if queue_record:
+            queue_record.last_error = str(e)
+            queue_record.retry_count = self.request.retries + 1
+            db.commit()
+        
+        db.rollback()
+        
+        try:
+            retry_delay = 300 * (2 ** self.request.retries)
+            logger.warning(f"⚠️ Retrying in {retry_delay}s")
+            raise self.retry(exc=e, countdown=retry_delay)
+            
+        except MaxRetriesExceededError:
+            logger.error(f"🚨 Max retries exceeded for lead_id={lead_id}")
+            
+            if queue_record:
+                queue_record.status = "failed"
+                queue_record.last_error = f"Max retries exceeded: {str(e)}"
+                queue_record.failed_at = datetime.utcnow()
+                db.commit()
+            
+            return {"success": False, "error": "Max retries exceeded"}
+
     finally:
         db.close()
-
-
-logger.info("✅ All Celery tasks registered with main celery_app")

@@ -211,3 +211,129 @@ def sync_agent_config():
     
     finally:
         db.close()
+
+@celery_app.task(name="cleanup_old_logs")
+def cleanup_old_logs():
+    """
+    Clean up old logs and queue entries.
+    Runs daily at midnight.
+    """
+    from app.models.agent_action_log import AgentActionLog
+    from datetime import timedelta
+    
+    db = SessionLocal()
+    
+    try:
+        # Delete logs older than 90 days
+        cutoff_date = datetime.utcnow() - timedelta(days=90)
+        
+        deleted_logs = db.query(AgentActionLog).filter(
+            AgentActionLog.timestamp < cutoff_date
+        ).delete()
+        
+        # Clean up old sent queue entries (older than 30 days)
+        queue_cutoff = datetime.utcnow() - timedelta(days=30)
+        deleted_queue = db.query(EmailQueue).filter(
+            EmailQueue.status == "sent",
+            EmailQueue.sent_at < queue_cutoff
+        ).delete()
+        
+        db.commit()
+        
+        logger.info(f"🗑️ Cleaned up {deleted_logs} old logs and {deleted_queue} old queue entries")
+        
+        return {
+            "deleted_logs": deleted_logs,
+            "deleted_queue": deleted_queue
+        }
+        
+    except Exception as e:
+        logger.error(f"Cleanup failed: {str(e)}")
+        db.rollback()
+        return {"error": str(e)}
+    finally:
+        db.close()
+
+
+@celery_app.task(name="recalculate_lead_scores")
+def recalculate_lead_scores():
+    """
+    Recalculate priority scores for all leads.
+    Runs daily.
+    """
+    from app.services.lead_scoring import LeadScorer
+    
+    db = SessionLocal()
+    
+    try:
+        count = LeadScorer.score_all_leads(db)
+        logger.info(f"📊 Recalculated scores for {count} leads")
+        return {"leads_scored": count}
+    except Exception as e:
+        logger.error(f"Lead scoring failed: {str(e)}")
+        return {"error": str(e)}
+    finally:
+        db.close()
+
+
+@celery_app.task(name="generate_daily_report")
+def generate_daily_report():
+    """
+    Generate and log daily performance report.
+    Runs daily at 9 AM.
+    """
+    db = SessionLocal()
+    
+    try:
+        from app.models.email_log import EmailLog
+        from app.models.email_reply import EmailReply
+        
+        # Yesterday's stats
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        yesterday_start = yesterday.replace(hour=0, minute=0, second=0)
+        yesterday_end = yesterday.replace(hour=23, minute=59, second=59)
+        
+        emails_sent = db.query(EmailLog).filter(
+            EmailLog.sent_at >= yesterday_start,
+            EmailLog.sent_at <= yesterday_end,
+            EmailLog.status == "sent"
+        ).count()
+        
+        replies = db.query(EmailReply).filter(
+            EmailReply.received_at >= yesterday_start,
+            EmailReply.received_at <= yesterday_end
+        ).count()
+        
+        interested = db.query(EmailReply).filter(
+            EmailReply.received_at >= yesterday_start,
+            EmailReply.received_at <= yesterday_end,
+            EmailReply.classification == "interested"
+        ).count()
+        
+        report = f"""
+📊 DAILY REPORT - {yesterday_start.strftime('%Y-%m-%d')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 Emails Sent: {emails_sent}
+💬 Replies: {replies}
+⭐ Interested: {interested}
+📈 Response Rate: {(replies/emails_sent*100):.1f}% if emails_sent > 0 else 0
+🎯 Interest Rate: {(interested/replies*100):.1f}% if replies > 0 else 0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"""
+        
+        logger.info(report)
+        
+        # TODO: Send report via email or Slack
+        
+        return {
+            "date": yesterday_start.strftime('%Y-%m-%d'),
+            "emails_sent": emails_sent,
+            "replies": replies,
+            "interested": interested
+        }
+        
+    except Exception as e:
+        logger.error(f"Daily report generation failed: {str(e)}")
+        return {"error": str(e)}
+    finally:
+        db.close()

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Autonomics - AI Agent Dashboard</title>
+    <title>Advanced Autonomics - Command Center</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
         }
 
@@ -29,17 +29,41 @@
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
             color: #667eea;
             font-size: 32px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .header p {
             color: #666;
             font-size: 16px;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-link {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .quick-link:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
         }
 
         .agent-control {
@@ -206,10 +230,12 @@
             display: flex;
             background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
         }
 
         .tab-button {
             flex: 1;
+            min-width: 150px;
             padding: 20px;
             border: none;
             background: transparent;
@@ -218,6 +244,7 @@
             font-weight: 600;
             color: #666;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .tab-button.active {
@@ -229,6 +256,8 @@
         .tab-content {
             display: none;
             padding: 30px;
+            max-height: 800px;
+            overflow-y: auto;
         }
 
         .tab-content.active {
@@ -259,6 +288,14 @@
 
         .btn-danger:hover {
             background: #d32f2f;
+        }
+
+        .btn-success {
+            background: #4caf50;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
         }
 
         table {
@@ -296,10 +333,10 @@
         .status-contacted { background: #fff3e0; color: #f57c00; }
         .status-replied { background: #e8f5e9; color: #388e3c; }
         .status-interested { background: #c8e6c9; color: #2e7d32; }
+        .status-follow_up { background: #fff9c4; color: #f57f17; }
 
-        /* Upload Zone */
         .upload-zone {
-            border: 3px dashed #4F46E5;
+            border: 3px dashed #667eea;
             border-radius: 12px;
             padding: 60px 40px;
             text-align: center;
@@ -310,12 +347,12 @@
         }
 
         .upload-zone:hover {
-            border-color: #7C3AED;
+            border-color: #764ba2;
             background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
         }
 
         .upload-zone.dragging {
-            border-color: #7C3AED;
+            border-color: #764ba2;
             background: linear-gradient(135deg, #667eea30 0%, #764ba230 100%);
         }
 
@@ -325,10 +362,11 @@
             height: 8px;
             overflow: hidden;
             margin: 20px 0;
+            display: none;
         }
 
         #progress-bar {
-            background: linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             height: 100%;
             width: 0%;
             transition: width 0.3s;
@@ -350,17 +388,72 @@
             background: linear-gradient(135deg, #ef444420 0%, #dc262620 100%);
             border: 2px solid #ef4444;
         }
+
+        .analytics-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .analytics-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .analytics-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .analytics-row:last-child {
+            border-bottom: none;
+        }
+
+        .queue-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: #fff3e0; color: #f57c00; }
+        .badge-sent { background: #e8f5e9; color: #388e3c; }
+        .badge-failed { background: #ffebee; color: #c62828; }
+        .badge-processing { background: #e3f2fd; color: #1976d2; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>🤖 Advanced Autonomics AI Agent</h1>
-            <p>Autonomous email outreach system with AI decision-making</p>
+            <div>
+                <h1>🤖 Advanced Autonomics AI Agent</h1>
+                <p>Autonomous email outreach system with AI decision-making</p>
+            </div>
+            <div class="quick-links">
+                <a href="/docs" class="quick-link" target="_blank">📚 API Docs</a>
+                <a href="/health/full" class="quick-link" target="_blank">💚 Health</a>
+                <a href="http://localhost:8000/static/monitor.html" class="quick-link" target="_blank">📊 Monitor</a>
+            </div>
         </div>
 
-        <!-- Agent Control Panel -->
         <div class="agent-control">
             <div class="agent-status">
                 <div class="agent-status-badge">
@@ -403,7 +496,6 @@
             </div>
         </div>
 
-        <!-- Stats Dashboard -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Leads</h3>
@@ -423,15 +515,17 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <div class="tab-buttons">
                 <button class="tab-button active" onclick="showTab('leads')">👥 Leads</button>
+                <button class="tab-button" onclick="showTab('analytics')">📊 Analytics</button>
+                <button class="tab-button" onclick="showTab('queue')">📧 Email Queue</button>
+                <button class="tab-button" onclick="showTab('replies')">💬 Replies</button>
                 <button class="tab-button" onclick="showTab('logs')">📋 Agent Logs</button>
+                <button class="tab-button" onclick="showTab('health')">💚 System Health</button>
                 <button class="tab-button" onclick="showTab('import')">📤 Import</button>
             </div>
 
-            <!-- Leads Tab -->
             <div class="tab-content active" id="tab-leads">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>All Leads</h2>
@@ -443,26 +537,95 @@
                 <div id="leads-table-container"></div>
             </div>
 
-            <!-- Agent Logs Tab -->
+            <div class="tab-content" id="tab-analytics">
+                <h2 style="margin-bottom: 20px;">📊 Campaign Analytics</h2>
+                
+                <div class="analytics-card">
+                    <h3>Overview (Last 30 Days)</h3>
+                    <div id="analytics-overview">Loading...</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Performance Metrics (Last 24 Hours)</h3>
+                    <div id="analytics-performance">Loading...</div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Top Performing Leads</h3>
+                    <div id="analytics-top-leads">Loading...</div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn" onclick="refreshAnalytics()">🔄 Refresh</button>
+                    <button class="btn btn-success" onclick="exportAnalytics()">📥 Export CSV</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-queue">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h2>📧 Email Queue</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="loadQueueStatus()">🔄 Refresh</button>
+                        <button class="btn btn-danger" onclick="clearFailedQueue()">🗑️ Clear Failed</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Pending</h3>
+                        <div class="value" id="queue-pending">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Processing</h3>
+                        <div class="value" id="queue-processing">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sent</h3>
+                        <div class="value" id="queue-sent">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Failed (Retryable)</h3>
+                        <div class="value" id="queue-failed">-</div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 15px 0;">Queue Items</h3>
+                <div id="queue-items"></div>
+            </div>
+
+            <div class="tab-content" id="tab-replies">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h2>💬 Email Replies</h2>
+                    <button class="btn" onclick="loadReplies()">🔄 Refresh</button>
+                </div>
+                <div id="replies-container"></div>
+            </div>
+
             <div class="tab-content" id="tab-logs">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <h2>Agent Activity Logs</h2>
+                    <h2>📋 Agent Activity Logs</h2>
                     <button class="btn" onclick="loadAgentLogs()">🔄 Refresh</button>
                 </div>
                 <div id="logs-container"></div>
             </div>
 
-            <!-- Import Tab -->
+            <div class="tab-content" id="tab-health">
+                <h2 style="margin-bottom: 20px;">💚 System Health Check</h2>
+                <div id="health-container">
+                    <button class="btn" onclick="loadHealthCheck()">🔍 Run Health Check</button>
+                </div>
+            </div>
+
             <div class="tab-content" id="tab-import">
                 <h2 style="margin-bottom: 20px;">📤 Import CSV Leads</h2>
                 <p style="color: #666; margin-bottom: 30px;">Upload a CSV file with columns: email, first_name, last_name, company, industry, location</p>
                 
                 <div id="upload-zone" class="upload-zone">
                     <div style="font-size: 64px; margin-bottom: 20px;">📁</div>
-                    <h3 style="color: #4F46E5; margin-bottom: 10px;">Drag & Drop CSV File Here</h3>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">Drag & Drop CSV File Here</h3>
                     <p style="color: #999; margin: 15px 0;">or</p>
                     <button onclick="document.getElementById('file-input').click()" style="
-                        background: #4F46E5;
+                        background: #667eea;
                         color: white;
                         border: none;
                         padding: 12px 32px;
@@ -494,7 +657,11 @@
         const API_BASE = 'http://localhost:8000';
         let agentStatus = null;
 
-        // Load agent status
+        setInterval(loadAgentStatus, 10000);
+
+        loadAgentStatus();
+        loadLeads();
+
         async function loadAgentStatus() {
             try {
                 const response = await fetch(`${API_BASE}/agent/status`);
@@ -553,7 +720,6 @@
             }
         }
 
-        // Agent controls
         async function startAgent() {
             if (!confirm('Start the AI agent? It will begin sending emails automatically.')) return;
             try {
@@ -597,33 +763,12 @@
                 alert(`✅ Agent cycle completed!\n\nQueued: ${result.results.emails_queued}\nSkipped: ${result.results.leads_skipped}\nErrors: ${result.results.errors}`);
                 loadAgentStatus();
                 loadAgentLogs();
+                loadQueueStatus();
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
         }
 
-        // Delete all leads
-        async function deleteAllLeads() {
-            if (!confirm('⚠️ DELETE ALL LEADS? This cannot be undone!')) return;
-            if (!confirm('Are you ABSOLUTELY SURE? All lead data will be permanently deleted!')) return;
-            
-            try {
-                // Delete from all tables
-                const response = await fetch(`${API_BASE}/leads/`, { method: 'DELETE' });
-                
-                if (response.ok) {
-                    alert('✅ All leads deleted successfully!');
-                    loadLeads();
-                    loadAgentStatus();
-                } else {
-                    alert('❌ Error deleting leads');
-                }
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
-
-        // Load leads
         async function loadLeads() {
             try {
                 const response = await fetch(`${API_BASE}/leads/?limit=100`);
@@ -658,7 +803,173 @@
             }
         }
 
-        // Load agent logs
+        async function loadAnalytics() {
+            try {
+                const overviewRes = await fetch(`${API_BASE}/analytics/overview`);
+                const overview = await overviewRes.json();
+                
+                const overviewContainer = document.getElementById('analytics-overview');
+                overviewContainer.innerHTML = `
+                    <div class="analytics-row">
+                        <span>Response Rate:</span>
+                        <strong>${overview.overview.response_rate}%</strong>
+                    </div>
+                    <div class="analytics-row">
+                        <span>Interest Rate:</span>
+                        <strong>${overview.overview.interested_rate}%</strong>
+                    </div>
+                    <div class="analytics-row">
+                        <span>Total Leads:</span>
+                        <strong>${overview.overview.total_leads}</strong>
+                    </div>
+                    <div class="analytics-row">
+                        <span>Contacted:</span>
+                        <strong>${overview.overview.contacted_leads}</strong>
+                    </div>
+                `;
+
+                const perfRes = await fetch(`${API_BASE}/analytics/performance?hours=24`);
+                const perf = await perfRes.json();
+                
+                const perfContainer = document.getElementById('analytics-performance');
+                perfContainer.innerHTML = `
+                    <div class="analytics-row">
+                        <span>Agent Success Rate:</span>
+                        <strong>${perf.agent.success_rate}%</strong>
+                    </div>
+                    <div class="analytics-row">
+                        <span>Avg Retries Before Success:</span>
+                        <strong>${perf.queue.avg_retries}</strong>
+                    </div>
+                    <div class="analytics-row">
+                        <span>Avg Processing Time:</span>
+                        <strong>${perf.queue.avg_processing_time_minutes} minutes</strong>
+                    </div>
+                `;
+
+                const leadsRes = await fetch(`${API_BASE}/analytics/top-performing-leads?limit=5`);
+                const topLeads = await leadsRes.json();
+                
+                const leadsContainer = document.getElementById('analytics-top-leads');
+                let leadsHtml = '<table><thead><tr><th>Email</th><th>Company</th><th>Status</th><th>Priority</th></tr></thead><tbody>';
+                
+                topLeads.leads.forEach(lead => {
+                    leadsHtml += `
+                        <tr>
+                            <td>${lead.email}</td>
+                            <td>${lead.company || '-'}</td>
+                            <td><span class="status-badge status-${lead.status}">${lead.status}</span></td>
+                            <td>${lead.priority_score.toFixed(1)}</td>
+                        </tr>
+                    `;
+                });
+                
+                leadsHtml += '</tbody></table>';
+                leadsContainer.innerHTML = leadsHtml;
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        async function refreshAnalytics() {
+            await loadAnalytics();
+        }
+
+        async function exportAnalytics() {
+            window.open(`${API_BASE}/analytics/export/csv`, '_blank');
+        }
+
+        async function loadQueueStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/queue/status`);
+                const data = await response.json();
+
+                document.getElementById('queue-pending').textContent = data.by_status.pending;
+                document.getElementById('queue-processing').textContent = data.by_status.processing;
+                document.getElementById('queue-sent').textContent = data.by_status.sent;
+                document.getElementById('queue-failed').textContent = data.failed_breakdown.can_retry;
+
+                const pendingRes = await fetch(`${API_BASE}/queue/pending?limit=20`);
+                const pending = await pendingRes.json();
+                
+                const container = document.getElementById('queue-items');
+                if (pending.items.length === 0) {
+                    container.innerHTML = '<p style="color: #999; text-align: center;">No items in queue</p>';
+                    return;
+                }
+
+                let html = '';
+                pending.items.forEach(item => {
+                    html += `
+                        <div class="queue-item">
+                            <div class="queue-item-header">
+                                <strong>${item.subject}</strong>
+                                <span class="badge badge-${item.status}">${item.status}</span>
+                            </div>
+                            <div style="font-size: 12px; color: #666;">
+                                Lead ID: ${item.lead_id} | Retry: ${item.retry_count}/3 | Scheduled: ${new Date(item.scheduled_at).toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading queue:', error);
+            }
+        }
+
+        async function clearFailedQueue() {
+            if (!confirm('Clear permanently failed emails from queue?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/queue/failed?only_permanent=true`, { method: 'DELETE' });
+                const result = await response.json();
+                alert(`✅ Cleared ${result.deleted} failed emails`);
+                loadQueueStatus();
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        async function loadReplies() {
+            try {
+                const response = await fetch(`${API_BASE}/replies/?limit=50`);
+                const data = await response.json();
+
+                const container = document.getElementById('replies-container');
+                
+                if (data.replies.length === 0) {
+                    container.innerHTML = '<p style="color: #999; text-align: center;">No replies yet</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>From</th><th>Subject</th><th>Classification</th><th>Matched</th><th>Received</th></tr></thead><tbody>';
+                
+                data.replies.forEach(reply => {
+                    const classificationColor = reply.classification === 'interested' ? 'status-interested' : 
+                                               reply.classification === 'not_interested' ? 'status-new' : 'status-contacted';
+                    
+                    html += `
+                        <tr>
+                            <td>${reply.from_email}</td>
+                            <td>${reply.subject || '(no subject)'}</td>
+                            <td><span class="status-badge ${classificationColor}">${reply.classification || 'unclassified'}</span></td>
+                            <td>${reply.matched ? '✅' : '❌'}</td>
+                            <td>${new Date(reply.received_at).toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading replies:', error);
+            }
+        }
+
         async function loadAgentLogs() {
             try {
                 const response = await fetch(`${API_BASE}/agent/logs?limit=50`);
@@ -667,22 +978,22 @@
                 const container = document.getElementById('logs-container');
                 
                 if (data.logs.length === 0) {
-                    container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px;">No agent logs yet</p>';
+                    container.innerHTML = '<p style="color: #999; text-align: center;">No logs yet</p>';
                     return;
                 }
 
                 let html = '<table><thead><tr><th>Time</th><th>Action</th><th>Lead</th><th>Result</th><th>Reason</th></tr></thead><tbody>';
                 
                 data.logs.forEach(log => {
-                    const time = new Date(log.timestamp).toLocaleString();
-                    const resultColor = log.action_result === 'success' ? '#4caf50' : log.action_result === 'error' ? '#f44336' : '#ff9800';
+                    const resultColor = log.action_result === 'success' ? 'status-interested' : 
+                                       log.action_result === 'error' ? 'status-new' : 'status-contacted';
                     
                     html += `
                         <tr>
-                            <td>${time}</td>
+                            <td>${new Date(log.timestamp).toLocaleString()}</td>
                             <td>${log.action_type}</td>
                             <td>${log.lead_email || '-'}</td>
-                            <td style="color: ${resultColor}; font-weight: bold;">${log.action_result}</td>
+                            <td><span class="status-badge ${resultColor}">${log.action_result}</span></td>
                             <td>${log.decision_reason || '-'}</td>
                         </tr>
                     `;
@@ -696,7 +1007,62 @@
             }
         }
 
-        // File upload handling
+        async function loadHealthCheck() {
+            try {
+                const response = await fetch(`${API_BASE}/health/full`);
+                const data = await response.json();
+
+                const container = document.getElementById('health-container');
+                
+                let html = `
+                    <div class="analytics-card">
+                        <h3>Overall Status: ${data.status === 'healthy' ? '✅' : '⚠️'} ${data.overall}</h3>
+                `;
+                
+                for (const [service, check] of Object.entries(data.checks)) {
+                    if (typeof check === 'object' && check.status) {
+                        const icon = check.status === 'healthy' ? '✅' : '❌';
+                        html += `
+                            <div class="analytics-row">
+                                <span>${icon} ${service}</span>
+                                <span>${check.message}</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                html += '</div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading health check:', error);
+                document.getElementById('health-container').innerHTML = `
+                    <div class="result-box result-error">
+                        <p>Failed to load health check: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function deleteAllLeads() {
+            if (!confirm('⚠️ DELETE ALL LEADS? This cannot be undone!')) return;
+            if (!confirm('Are you ABSOLUTELY SURE? All lead data will be permanently deleted!')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/leads/`, { method: 'DELETE' });
+                
+                if (response.ok) {
+                    alert('✅ All leads deleted successfully!');
+                    loadLeads();
+                    loadAgentStatus();
+                } else {
+                    alert('❌ Error deleting leads');
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
         const uploadZone = document.getElementById('upload-zone');
         const fileInput = document.getElementById('file-input');
 
@@ -728,11 +1094,11 @@
 
             const progressContainer = document.getElementById('upload-progress-container');
             const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
             const resultsDiv = document.getElementById('upload-results');
 
             uploadZone.style.display = 'none';
             progressContainer.style.display = 'block';
+            document.getElementById('upload-progress').style.display = 'block';
             resultsDiv.innerHTML = '';
 
             const formData = new FormData();
@@ -798,7 +1164,6 @@
             fileInput.value = '';
         }
 
-        // Tab switching
         function showTab(tabName) {
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -807,15 +1172,12 @@
             document.getElementById('tab-' + tabName).classList.add('active');
 
             if (tabName === 'leads') loadLeads();
+            if (tabName === 'analytics') loadAnalytics();
+            if (tabName === 'queue') loadQueueStatus();
+            if (tabName === 'replies') loadReplies();
             if (tabName === 'logs') loadAgentLogs();
+            if (tabName === 'health') loadHealthCheck();
         }
-
-        // Auto-refresh
-        setInterval(loadAgentStatus, 10000);
-
-        // Initial load
-        loadAgentStatus();
-        loadLeads();
     </script>
 </body>
 </html>

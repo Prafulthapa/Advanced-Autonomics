@@ -8,12 +8,18 @@ import os
 
 logger = logging.getLogger(__name__)
 
-# IMAP Configuration
-IMAP_HOST = os.getenv("IMAP_HOST", "greenmail")
-IMAP_PORT = int(os.getenv("IMAP_PORT", "3143"))
-IMAP_USER = os.getenv("IMAP_USER", "outreach@advancedautonomics.com")
-IMAP_PASSWORD = os.getenv("IMAP_PASSWORD", "password123")
-IMAP_USE_SSL = os.getenv("IMAP_USE_SSL", "false").lower() == "true"
+# ============================================
+# ✅ FIXED: IMAP Configuration (Gmail)
+# ============================================
+IMAP_HOST = os.getenv("IMAP_HOST", "imap.gmail.com")  # ✅ Changed default
+IMAP_PORT = int(os.getenv("IMAP_PORT", "993"))  # ✅ Changed default
+IMAP_USERNAME = os.getenv("IMAP_USERNAME")  # ✅ Changed from IMAP_USER
+IMAP_PASSWORD = os.getenv("IMAP_PASSWORD")
+IMAP_USE_SSL = os.getenv("IMAP_USE_SSL", "true").lower() == "true"  # ✅ Changed default
+
+# Debug logging
+logger.info(f"📧 IMAP Config: {IMAP_HOST}:{IMAP_PORT} (SSL: {IMAP_USE_SSL})")
+logger.info(f"👤 IMAP User: {IMAP_USERNAME}")
 
 
 class IMAPService:
@@ -24,21 +30,31 @@ class IMAPService:
         """Establish IMAP connection."""
         try:
             if IMAP_USE_SSL:
-                logger.info(f"Connecting to IMAP (SSL) at {IMAP_HOST}:{IMAP_PORT}")
+                logger.info(f"🔐 Connecting to IMAP (SSL) at {IMAP_HOST}:{IMAP_PORT}")
                 mail = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
             else:
-                logger.info(f"Connecting to IMAP at {IMAP_HOST}:{IMAP_PORT}")
+                logger.info(f"📡 Connecting to IMAP at {IMAP_HOST}:{IMAP_PORT}")
                 mail = imaplib.IMAP4(IMAP_HOST, IMAP_PORT)
 
             # Login if credentials provided
-            if IMAP_USER and IMAP_PASSWORD:
-                mail.login(IMAP_USER, IMAP_PASSWORD)
-                logger.info(f"✓ Logged in as {IMAP_USER}")
+            if IMAP_USERNAME and IMAP_PASSWORD:
+                logger.info(f"🔑 Logging in as {IMAP_USERNAME}")
+                mail.login(IMAP_USERNAME, IMAP_PASSWORD)
+                logger.info(f"✅ Logged in successfully")
+            else:
+                logger.error("❌ IMAP credentials not provided")
+                raise Exception("IMAP_USERNAME or IMAP_PASSWORD not set")
 
             return mail
 
+        except imaplib.IMAP4.error as e:
+            logger.error(f"❌ IMAP authentication failed: {str(e)}")
+            logger.error(f"   Host: {IMAP_HOST}:{IMAP_PORT}")
+            logger.error(f"   User: {IMAP_USERNAME}")
+            logger.error(f"   SSL: {IMAP_USE_SSL}")
+            raise
         except Exception as e:
-            logger.error(f"Failed to connect to IMAP: {str(e)}", exc_info=True)
+            logger.error(f"❌ Failed to connect to IMAP: {str(e)}", exc_info=True)
             raise
 
     @staticmethod
@@ -132,7 +148,7 @@ class IMAPService:
                 return emails
 
             email_ids = messages[0].split()
-            logger.info(f"Found {len(email_ids)} unread emails")
+            logger.info(f"📬 Found {len(email_ids)} unread emails")
 
             # Process most recent emails first (limit)
             for email_id in email_ids[-limit:]:
@@ -191,17 +207,17 @@ class IMAPService:
                     }
 
                     emails.append(parsed_email)
-                    logger.info(f"✓ Parsed email from {from_email}")
+                    logger.info(f"✅ Parsed email from {from_email}")
 
                 except Exception as e:
                     logger.error(f"Error processing email {email_id}: {str(e)}", exc_info=True)
                     continue
 
-            logger.info(f"Successfully fetched {len(emails)} emails")
+            logger.info(f"✅ Successfully fetched {len(emails)} emails")
             return emails
 
         except Exception as e:
-            logger.error(f"Error fetching emails: {str(e)}", exc_info=True)
+            logger.error(f"❌ Error fetching emails: {str(e)}", exc_info=True)
             return emails
 
         finally:

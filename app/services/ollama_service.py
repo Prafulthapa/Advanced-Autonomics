@@ -21,7 +21,8 @@ class OllamaService:
         try:
             logger.info(f"Connecting to Ollama at {OLLAMA_HOST} with model {MODEL_NAME}")
             
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            # Increased timeout from 60 to 180 seconds
+            async with httpx.AsyncClient(timeout=httpx.Timeout(180.0)) as client:
                 response = await client.post(f"{OLLAMA_HOST}/api/generate", json=payload)
                 
                 logger.info(f"Ollama response status: {response.status_code}")
@@ -66,7 +67,8 @@ class OllamaService:
         }
         
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            # Increased timeout from 60 to 180 seconds
+            async with httpx.AsyncClient(timeout=httpx.Timeout(180.0)) as client:
                 response = await client.post(f"{OLLAMA_HOST}/api/generate", json=payload)
                 response.raise_for_status()
                 return response.json().get("response", "").strip().lower()
