@@ -11,6 +11,27 @@ celery_app = Celery(
 )
 
 # ============================================
+# WORKER CONFIGURATION
+# ============================================
+from app.worker.celery_config import (
+    WORKER_CONCURRENCY,
+    MAX_TASKS_PER_CHILD,
+    TASK_SOFT_TIME_LIMIT,
+    TASK_HARD_TIME_LIMIT,
+    TASK_ACKS_LATE,
+    WORKER_PREFETCH_MULTIPLIER
+)
+
+celery_app.conf.update(
+    worker_concurrency=WORKER_CONCURRENCY,
+    worker_max_tasks_per_child=MAX_TASKS_PER_CHILD,
+    task_soft_time_limit=TASK_SOFT_TIME_LIMIT,
+    task_time_limit=TASK_HARD_TIME_LIMIT,
+    task_acks_late=TASK_ACKS_LATE,
+    worker_prefetch_multiplier=WORKER_PREFETCH_MULTIPLIER,
+)
+
+# ============================================
 # TASK ROUTES
 # ============================================
 
@@ -19,38 +40,18 @@ celery_app.conf.task_routes = {
     "send_email_task": {"queue": "emails"},
     "agent_cycle_task": {"queue": "agent"},
     "agent_health_check": {"queue": "agent"},
-    "fetch_and_process_replies": {"queue": "replies"},  # ✅ NEW: IMAP route
+    "fetch_and_process_replies": {"queue": "replies"},
 }
 
 # ============================================
-# CELERY BEAT SCHEDULE
+# 🔥 CRITICAL: CELERY BEAT SCHEDULE
 # ============================================
 
 celery_app.conf.beat_schedule = {
-    # Main agent cycle - every 5 minutes
+    # ✅ MAIN AGENT CYCLE - RUNS EVERY 5 MINUTES
     "agent-cycle": {
         "task": "agent_cycle_task",
-        "schedule": 300.0,
-    },
-
-    # Health check - every 1 minute
-    "agent-health-check": {
-        "task": "agent_health_check",
-        "schedule": 60.0,
-    },
-
-    # ✅ NEW: Fetch email replies every 15 minutes
-    "fetch-email-replies": {
-        "task": "fetch_and_process_replies",
-        "schedule": 900.0,  # 15 minutes
-    },
-}
-
-celery_app.conf.beat_schedule = {
-    # Main agent cycle - every 5 minutes
-    "agent-cycle": {
-        "task": "agent_cycle_task",
-        "schedule": 300.0,
+        "schedule": 300.0,  # Every 5 minutes (300 seconds)
     },
 
     # Health check - every 1 minute
@@ -62,22 +63,22 @@ celery_app.conf.beat_schedule = {
     # Fetch email replies every 15 minutes
     "fetch-email-replies": {
         "task": "fetch_and_process_replies",
-        "schedule": 900.0,
+        "schedule": 900.0,  # Every 15 minutes
     },
 
-    # ✅ NEW: Cleanup old logs - daily at midnight
+    # Cleanup old logs - daily at midnight
     "cleanup-old-logs": {
         "task": "cleanup_old_logs",
         "schedule": crontab(hour=0, minute=0),
     },
 
-    # ✅ NEW: Recalculate lead scores - daily at 2 AM
+    # Recalculate lead scores - daily at 2 AM
     "recalculate-lead-scores": {
         "task": "recalculate_lead_scores",
         "schedule": crontab(hour=2, minute=0),
     },
 
-    # ✅ NEW: Daily report - every day at 9 AM
+    # Daily report - every day at 9 AM
     "daily-report": {
         "task": "generate_daily_report",
         "schedule": crontab(hour=9, minute=0),
@@ -87,6 +88,7 @@ celery_app.conf.beat_schedule = {
 celery_app.conf.timezone = "UTC"
 
 print("✅ Celery app configured with correct task routes")
+print(f"📅 Beat schedule configured with {len(celery_app.conf.beat_schedule)} tasks")
 
 # ============================================
 # 🔴 CRITICAL: TASK REGISTRATION
@@ -94,10 +96,16 @@ print("✅ Celery app configured with correct task routes")
 
 # Import ALL task modules so Celery registers them
 import app.worker.tasks         # noqa: F401
-import app.worker.agent_tasks   # 👈 ✅ THE FIX (REQUIRED)
-import app.worker.imap_tasks    # ✅ NEW: Register IMAP tasks
+import app.worker.agent_tasks   # noqa: F401
+import app.worker.imap_tasks    # noqa: F401
 
 print(
     f"✅ Tasks registered: "
     f"{len([k for k in celery_app.tasks.keys() if not k.startswith('celery.')])}"
 )
+
+# Verify critical tasks
+if 'agent-cycle' in celery_app.conf.beat_schedule:
+    print("✅ VERIFIED: agent-cycle task is scheduled")
+else:
+    print("❌ WARNING: agent-cycle task NOT in schedule!")
