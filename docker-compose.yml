@@ -25,11 +25,11 @@ services:
       context: .
       dockerfile: ./Dockerfile.worker
     container_name: worker
-    # FIXED: Changed from app.worker.tasks to app.worker.celery_app
     command: celery -A app.worker.celery_app worker --loglevel=info --queues=emails,agent,replies
     volumes:
       - ./data:/app/data
       - ./agent_config.yaml:/app/agent_config.yaml
+       - /var/run/docker.sock:/var/run/docker.sock  # ✅ ADD THIS LINE
     env_file:
       - .env
     environment:
@@ -73,20 +73,26 @@ services:
     volumes:
       - ollama:/root/.ollama
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    # Pre-pull model on startup
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        /bin/ollama serve &
-        sleep 5
-        ollama pull llama3.2:3b
-        wait
+    command: ["serve"]
 
+  lead-scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    container_name: lead-scraper
+    volumes:
+      - ./lead_scraper:/app/lead_scraper
+      - ./data:/app/data
+    environment:
+      - LINKEDIN_EMAIL=monkeymind4336@gmail.com
+      - LINKEDIN_PASSWORD=Nepal123!
+      - REDIS_URL=redis://redis:6379/0 
+    depends_on:
+      - ollama
+      - api
+    restart: unless-stopped
+
+# 🔻 REQUIRED TOP-LEVEL DEFINITIONS (THIS FIXES YOUR ERROR)
 volumes:
   ollama:
   redis-data:

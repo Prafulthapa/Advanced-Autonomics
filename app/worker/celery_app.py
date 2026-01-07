@@ -41,17 +41,19 @@ celery_app.conf.task_routes = {
     "agent_cycle_task": {"queue": "agent"},
     "agent_health_check": {"queue": "agent"},
     "fetch_and_process_replies": {"queue": "replies"},
+    "process_scraped_lead": {"queue": "emails"},
+    "run_linkedin_scraper": {"queue": "scraper"},
 }
 
 # ============================================
-# 🔥 CRITICAL: CELERY BEAT SCHEDULE
+# CELERY BEAT SCHEDULE
 # ============================================
 
 celery_app.conf.beat_schedule = {
-    # ✅ MAIN AGENT CYCLE - RUNS EVERY 5 MINUTES
+    # MAIN AGENT CYCLE - EVERY 5 MINUTES
     "agent-cycle": {
         "task": "agent_cycle_task",
-        "schedule": 300.0,  # Every 5 minutes (300 seconds)
+        "schedule": 300.0,
     },
 
     # Health check - every 1 minute
@@ -63,7 +65,7 @@ celery_app.conf.beat_schedule = {
     # Fetch email replies every 15 minutes
     "fetch-email-replies": {
         "task": "fetch_and_process_replies",
-        "schedule": 900.0,  # Every 15 minutes
+        "schedule": 900.0,
     },
 
     # Cleanup old logs - daily at midnight
@@ -83,6 +85,12 @@ celery_app.conf.beat_schedule = {
         "task": "generate_daily_report",
         "schedule": crontab(hour=9, minute=0),
     },
+
+    # Run scraper every 6 hours
+    "scrape-new-leads": {
+        "task": "run_linkedin_scraper",
+        "schedule": crontab(hour="*/6"),
+    },
 }
 
 celery_app.conf.timezone = "UTC"
@@ -91,20 +99,21 @@ print("✅ Celery app configured with correct task routes")
 print(f"📅 Beat schedule configured with {len(celery_app.conf.beat_schedule)} tasks")
 
 # ============================================
-# 🔴 CRITICAL: TASK REGISTRATION
+# ⚠️ IMPORT TASKS AT THE END (AFTER celery_app IS DEFINED)
 # ============================================
 
-# Import ALL task modules so Celery registers them
-import app.worker.tasks         # noqa: F401
-import app.worker.agent_tasks   # noqa: F401
-import app.worker.imap_tasks    # noqa: F401
+# This MUST come after celery_app is created
+import app.worker.tasks       # noqa: F401
+import app.worker.agent_tasks # noqa: F401
+import app.worker.imap_tasks  # noqa: F401
+import app.worker.lead_tasks  # noqa: F401, E402
+import app.worker.scraper_scheduler  # noqa: F401, E402
 
 print(
     f"✅ Tasks registered: "
     f"{len([k for k in celery_app.tasks.keys() if not k.startswith('celery.')])}"
 )
 
-# Verify critical tasks
 if 'agent-cycle' in celery_app.conf.beat_schedule:
     print("✅ VERIFIED: agent-cycle task is scheduled")
 else:

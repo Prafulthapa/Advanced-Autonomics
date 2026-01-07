@@ -9,9 +9,9 @@ import os
 logger = logging.getLogger(__name__)
 
 # ============================================
-# ✅ FIXED: IMAP Configuration (Gmail)
+# ✅ FIXED: IMAP Configuration (Hostinger)
 # ============================================
-IMAP_HOST = os.getenv("IMAP_HOST", "imap.gmail.com")  # ✅ Changed default
+IMAP_HOST = os.getenv("IMAP_HOST", "imap.hostinger.com")  # ✅ Changed default
 IMAP_PORT = int(os.getenv("IMAP_PORT", "993"))  # ✅ Changed default
 IMAP_USERNAME = os.getenv("IMAP_USERNAME")  # ✅ Changed from IMAP_USER
 IMAP_PASSWORD = os.getenv("IMAP_PASSWORD")

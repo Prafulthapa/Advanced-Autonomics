@@ -1,0 +1,9 @@
+#................................................................
+# Lead Scraper Requirements
+selenium>=4.15.0
+requests==2.31.0
+httpx==0.25.2
+dnspython==2.4.2
+beautifulsoup4==4.12.2
+celery==5.3.4
+redis==5.0.1
