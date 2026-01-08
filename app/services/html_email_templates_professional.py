@@ -228,11 +228,11 @@ def get_full_professional_template(
     images = {
         "company_logo": "app/static/images/logo.png",
         "footer_logo": "app/static/images/logo.png",
-        "hero_robot": "app/static/images/robot_hero.jpg",
-        "yudhistir_headshot": "app/static/images/yudhistir.jpg",  # ADD THIS
-        "gerry_headshot": "app/static/images/gerry.jpg",  # ADD THIS
-        "robot_1": "app/static/images/robot_1.jpg",
-        "robot_2": "app/static/images/robot_2.jpg",
+        "robot_lift_module": "app/static/images/robot_lift.jpg",
+        "robot_product_shot": "app/static/images/robot_product.jpg",  # ADD THIS
+        "qr_code": "app/static/images/qr_code.jpg",  # ADD THIS
+        "robot_amr_warehouse": "app/static/images/robot_amr_warehouse.jpg",
+        "robot_amr_pallet": "app/static/images/robot_amr_pallet.jpg",
     }
     
     return html_body, images

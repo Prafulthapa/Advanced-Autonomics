@@ -73,11 +73,11 @@ def get_subject_for_industry(industry: str, company: str = None) -> str:
     These are the approved subject lines from the template document.
     """
     if not industry:
-        return "Pilot Opportunity: Autonomous Handling for Operations"
+        return "Lock In All-Inclusive AMR Pricing Before January 31, 2026"
 
     industry_lower = industry.lower()
 
     if "glass" in industry_lower:
-        return "Pilot Opportunity: Autonomous Handling for Glassworks Operations"
+        return "Lock In All-Inclusive AMR Pricing Before January 31, 2026."
     else:
         return f"Automation Opportunity for {company}" if company else "Pilot Opportunity"

@@ -1,15 +1,16 @@
 # test_all_images.py
 import os
 
+    # CRITICAL: All cid: references in HTML must have matching keys here
 images = {
-    "company_logo": "app/static/images/logo.png",
-    "footer_logo": "app/static/images/logo.png",
-    "hero_robot": "app/static/images/robot_hero.jpg",
-    "yudhistir_headshot": "app/static/images/yudhistir.jpg",
-    "gerry_headshot": "app/static/images/gerry.jpg",
-    "robot_1": "app/static/images/robot_1.jpg",
-    "robot_2": "app/static/images/robot_2.jpg",
-}
+        "company_logo": "app/static/images/logo.png",
+        "footer_logo": "app/static/images/logo.png",
+        "robot_lift_module": "app/static/images/robot_lift.jpg",
+        "robot_product_shot": "app/static/images/robot_product.jpg",  # ADD THIS
+        "qr_code": "app/static/images/qr_code.jpg",  # ADD THIS
+        "robot_amr_warehouse": "app/static/images/robot_amr_warehouse.jpg",
+        "robot_amr_pallet": "app/static/images/robot_amr_pallet.jpg",
+    }
 
 print("🖼️ Checking ALL image paths:")
 all_exist = True
