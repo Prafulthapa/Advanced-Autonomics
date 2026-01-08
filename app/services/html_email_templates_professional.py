@@ -1,6 +1,6 @@
 """
 PROFESSIONAL HTML Email Templates for Advanced Autonomics
-Uses actual robot images from your collection
+Uses actual robot images from your collection with proper inline embedding
 """
 
 def get_simple_professional_template(
@@ -190,6 +190,7 @@ def get_simple_professional_template(
 </html>
 """
 
+    # CRITICAL: Images dict must match the cid: references in HTML
     images = {
         "company_logo": "app/static/images/logo.png",
         "footer_logo": "app/static/images/logo.png",
@@ -206,12 +207,12 @@ def get_full_professional_template(
     company: str,
     email: str
 ) -> tuple[str, dict]:
-    """Full professional HTML template."""
+    """Full professional HTML template with proper image embedding."""
     
     import os
     
-    # USE THE SAFE VERSION
-    template_path = "app/static/templates/professional_email_safe.html"  # ← CHANGED
+    # Use the safe version
+    template_path = "app/static/templates/professional_email_safe.html"
     
     if os.path.exists(template_path):
         with open(template_path, 'r', encoding='utf-8') as f:
@@ -223,11 +224,13 @@ def get_full_professional_template(
     html_body = html_body.replace('{{EMAIL}}', email)
     html_body = html_body.replace('{{UNSUBSCRIBE_LINK}}', f'http://localhost:8000/unsubscribe?email={email}')
     
+    # CRITICAL: All cid: references in HTML must have matching keys here
     images = {
         "company_logo": "app/static/images/logo.png",
         "footer_logo": "app/static/images/logo.png",
         "hero_robot": "app/static/images/robot_hero.jpg",
-        "problem_image": "app/static/images/robot_problem.jpg",
+        "yudhistir_headshot": "app/static/images/yudhistir.jpg",  # ADD THIS
+        "gerry_headshot": "app/static/images/gerry.jpg",  # ADD THIS
         "robot_1": "app/static/images/robot_1.jpg",
         "robot_2": "app/static/images/robot_2.jpg",
     }
