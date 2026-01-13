@@ -4,14 +4,14 @@ import os
     # CRITICAL: All cid: references in HTML must have matching keys here
 images = {
         "company_logo": "app/static/images/logo.png",
-        "footer_logo": "app/static/images/logo.png",
-        "robot_lift_module": "app/static/images/robot_lift.jpg",
-        "robot_product_shot": "app/static/images/robot_product.jpg",  # ADD THIS
-        "qr_code": "app/static/images/qr_code.jpg",  # ADD THIS
-        "robot_amr_warehouse": "app/static/images/robot_amr_warehouse.jpg",
-        "robot_amr_pallet": "app/static/images/robot_amr_pallet.jpg",
+        "hero_robot_workshop": "app/static/images/hero_robot_workshop.jpg",
+        "carpentry_applications_collage": "app/static/images/carpentry_applications_collage.jpg",
+        "why_switch_left": "app/static/images/why_switch_left.jpg",  # ADD THIS
+        "why_switch_right": "app/static/images/why_switch_right.jpg",  # ADD THIS
+        "technical_left": "app/static/images/technical_left.jpg",
+        "technical_right": "app/static/images/technical_right.jpg",
+        "warranty_badge_5years": "app/static/images/warranty_badge_5years.png",
     }
-
 print("🖼️ Checking ALL image paths:")
 all_exist = True
 for cid, path in images.items():

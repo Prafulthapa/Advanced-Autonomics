@@ -91,6 +91,11 @@ celery_app.conf.beat_schedule = {
         "task": "run_linkedin_scraper",
         "schedule": crontab(hour="*/6"),
     },
+    
+        "auto-scrape-leads": {
+        "task": "run_automated_lead_pipeline",
+        "schedule": crontab(hour="*/6"),  # Every 6 hours
+    },
 }
 
 celery_app.conf.timezone = "UTC"

@@ -90,7 +90,8 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
         html_body, images = get_full_professional_template(
             first_name=first_name,
             company=company,
-            email=lead.email
+            email=lead.email,
+            lead=lead  # 👈 ADD THIS LINE
         )
 
         # -----------------------------
@@ -141,7 +142,7 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
             body=plain_text_body,   # Plain text fallback
             to_name=to_name,
             html_body=html_body,    # HTML version
-            images=images           # Embedded images
+            images=None          # Using CDN-hosted images
         )
 
         # -----------------------------

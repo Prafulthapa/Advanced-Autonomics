@@ -15,6 +15,7 @@ from app.routes.queue_routes import router as queue_router
 from app.routes.health_routes import router as health_router
 from app.routes.analytics_routes import router as analytics_router
 from app.routes.queue_routes import router as queue_router
+from app.routes.campaign_routes import router as campaign_router
 
 # Create database tables (including new email_queue)
 Base.metadata.create_all(bind=engine)
@@ -57,6 +58,7 @@ from app.routes.import_routes import router as import_router
 from app.routes.reply_routes import router as reply_router
 from app.routes.agent_routes import router as agent_router
 
+app.include_router(campaign_router)
 app.include_router(queue_router)  # ✅ NEW: Email queue monitoring
 app.include_router(health_router)      # ✅ Health checks
 app.include_router(analytics_router)    # ✅ Analytics

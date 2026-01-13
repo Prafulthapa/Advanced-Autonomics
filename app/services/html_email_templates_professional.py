@@ -205,34 +205,41 @@ def get_simple_professional_template(
 def get_full_professional_template(
     first_name: str,
     company: str,
-    email: str
+    email: str,
+    lead=None
 ) -> tuple[str, dict]:
-    """Full professional HTML template with proper image embedding."""
+    """
+    Get template based on lead's stored preference.
+    NOW RETURNS EMPTY IMAGES DICT (using CDN instead of CID)
+    """
+    from app.services.template_selector import (
+        get_template_for_lead,
+        load_template_html
+    )
+    import logging
     
-    import os
+    logger = logging.getLogger(__name__)
     
-    # Use the safe version
-    template_path = "app/static/templates/professional_email_safe.html"
-    
-    if os.path.exists(template_path):
-        with open(template_path, 'r', encoding='utf-8') as f:
-            html_body = f.read()
+    # Get template based on lead's stored preference
+    if lead:
+        template_path, template_type = get_template_for_lead(lead)
     else:
+        template_path = "app/static/templates/glass_template.html"
+        template_type = "glass"
+    
+    logger.info(f"🎯 Lead: {email} → Template: {template_type}")
+    
+    try:
+        # Load template HTML
+        html_body = load_template_html(template_path, email, first_name, company)
+        
+        # 🔥 RETURN EMPTY IMAGES - CDN URLs are already in HTML templates
+        images = {}
+        
+        logger.info(f"✅ Template loaded successfully: {template_type}")
+        return html_body, images
+        
+    except FileNotFoundError as e:
+        # Fallback to simple template
+        logger.error(f"❌ Template error: {e}, falling back to simple template")
         return get_simple_professional_template(first_name, company, email)
-    
-    # Replace placeholders
-    html_body = html_body.replace('{{EMAIL}}', email)
-    html_body = html_body.replace('{{UNSUBSCRIBE_LINK}}', f'http://localhost:8000/unsubscribe?email={email}')
-    
-    # CRITICAL: All cid: references in HTML must have matching keys here
-    images = {
-        "company_logo": "app/static/images/logo.png",
-        "footer_logo": "app/static/images/logo.png",
-        "robot_lift_module": "app/static/images/robot_lift.jpg",
-        "robot_product_shot": "app/static/images/robot_product.jpg",  # ADD THIS
-        "qr_code": "app/static/images/qr_code.jpg",  # ADD THIS
-        "robot_amr_warehouse": "app/static/images/robot_amr_warehouse.jpg",
-        "robot_amr_pallet": "app/static/images/robot_amr_pallet.jpg",
-    }
-    
-    return html_body, images

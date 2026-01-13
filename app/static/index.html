@@ -66,6 +66,135 @@
             transform: translateY(-2px);
         }
 
+        /* 🔥 NEW: Template Selector Styles */
+        .template-selector {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .template-selector h2 {
+            color: white;
+            margin: 0 0 20px 0;
+            font-size: 24px;
+        }
+        
+        .template-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .template-btn {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            background: white;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .template-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .template-btn.active {
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.3);
+        }
+        
+        .template-btn h3 {
+            color: #667eea;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+        }
+        
+        .template-btn p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .template-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .selected-template-indicator {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .selected-template-indicator p {
+            color: white;
+            font-size: 16px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* 🔥 NEW: Campaign Controls */
+        .campaign-controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .campaign-controls h2 {
+            color: #667eea;
+            margin: 0 0 20px 0;
+        }
+        
+        .campaign-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .campaign-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 15px 25px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .campaign-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .campaign-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .campaign-btn.warning {
+            background: #ff9800;
+        }
+
+        .campaign-btn.danger {
+            background: #f44336;
+        }
+
         .agent-control {
             background: white;
             padding: 25px;
@@ -442,6 +571,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <div>
                 <h1>🤖 Advanced Autonomics AI Agent</h1>
@@ -454,6 +584,47 @@
             </div>
         </div>
 
+        <!-- 🔥 NEW: Template Selector -->
+        <div class="template-selector">
+            <h2>📧 Select Email Template for Campaign</h2>
+            <div class="template-buttons">
+                <div class="template-btn" id="template-glass" onclick="selectTemplate('glass')">
+                    <div class="template-icon">🪟</div>
+                    <h3>Glass Industry</h3>
+                    <p>For glassworks, glazing, window manufacturers</p>
+                    <p style="margin-top: 10px; font-weight: 600; color: #667eea;">Price: $199,000 | AMR + Scissor Lift</p>
+                </div>
+                
+                <div class="template-btn" id="template-wood" onclick="selectTemplate('wood')">
+                    <div class="template-icon">🪵</div>
+                    <h3>Wood & Carpentry</h3>
+                    <p>For woodworking, furniture, timber industries</p>
+                    <p style="margin-top: 10px; font-weight: 600; color: #667eea;">8th Gen Carpentry Systems</p>
+                </div>
+            </div>
+            
+            <div class="selected-template-indicator">
+                <p id="selected-template-text">⚠️ No template selected - Please select one above to enable campaigns</p>
+            </div>
+        </div>
+
+        <!-- 🔥 NEW: Campaign Controls -->
+        <div class="campaign-controls">
+            <h2>🚀 Campaign Actions</h2>
+            <div class="campaign-actions">
+                <button class="campaign-btn" onclick="sendToNewLeads()" id="btn-send-new" disabled>
+                    ✉️ Send to New Leads (Selected Template)
+                </button>
+                <button class="campaign-btn warning" onclick="sendFollowups()">
+                    🔄 Send Follow-ups (Original Templates)
+                </button>
+                <button class="campaign-btn danger" onclick="pauseCampaign()">
+                    ⏸️ Pause All Campaigns
+                </button>
+            </div>
+        </div>
+
+        <!-- Agent Control Panel -->
         <div class="agent-control">
             <div class="agent-status">
                 <div class="agent-status-badge">
@@ -496,6 +667,7 @@
             </div>
         </div>
 
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Leads</h3>
@@ -515,6 +687,7 @@
             </div>
         </div>
 
+        <!-- Tabs -->
         <div class="tabs">
             <div class="tab-buttons">
                 <button class="tab-button active" onclick="showTab('leads')">👥 Leads</button>
@@ -526,6 +699,7 @@
                 <button class="tab-button" onclick="showTab('import')">📤 Import</button>
             </div>
 
+            <!-- Leads Tab -->
             <div class="tab-content active" id="tab-leads">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>All Leads</h2>
@@ -537,6 +711,7 @@
                 <div id="leads-table-container"></div>
             </div>
 
+            <!-- Analytics Tab -->
             <div class="tab-content" id="tab-analytics">
                 <h2 style="margin-bottom: 20px;">📊 Campaign Analytics</h2>
                 
@@ -561,6 +736,7 @@
                 </div>
             </div>
 
+            <!-- Queue Tab -->
             <div class="tab-content" id="tab-queue">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>📧 Email Queue</h2>
@@ -593,6 +769,7 @@
                 <div id="queue-items"></div>
             </div>
 
+            <!-- Replies Tab -->
             <div class="tab-content" id="tab-replies">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>💬 Email Replies</h2>
@@ -601,6 +778,7 @@
                 <div id="replies-container"></div>
             </div>
 
+            <!-- Logs Tab -->
             <div class="tab-content" id="tab-logs">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>📋 Agent Activity Logs</h2>
@@ -609,6 +787,7 @@
                 <div id="logs-container"></div>
             </div>
 
+            <!-- Health Tab -->
             <div class="tab-content" id="tab-health">
                 <h2 style="margin-bottom: 20px;">💚 System Health Check</h2>
                 <div id="health-container">
@@ -616,6 +795,7 @@
                 </div>
             </div>
 
+            <!-- Import Tab -->
             <div class="tab-content" id="tab-import">
                 <h2 style="margin-bottom: 20px;">📤 Import CSV Leads</h2>
                 <p style="color: #666; margin-bottom: 30px;">Upload a CSV file with columns: email, first_name, last_name, company, industry, location</p>
@@ -656,12 +836,148 @@
     <script>
         const API_BASE = 'http://localhost:8000';
         let agentStatus = null;
+        let selectedTemplate = null; // 🔥 NEW: Track selected template
 
+        // Initialize
         setInterval(loadAgentStatus, 10000);
-
         loadAgentStatus();
         loadLeads();
 
+        // 🔥 NEW: Template Selection Function
+        function selectTemplate(templateType) {
+            selectedTemplate = templateType;
+            
+            // Update UI - remove active from all, add to selected
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`template-${templateType}`).classList.add('active');
+            
+            // Update indicator text
+            const templateNames = {
+                'glass': '🪟 Glass Industry Template',
+                'wood': '🪵 Wood & Carpentry Template'
+            };
+            document.getElementById('selected-template-text').textContent = 
+                `✅ Selected: ${templateNames[templateType]} - Ready to send!`;
+            
+            // Enable the campaign button
+            document.getElementById('btn-send-new').disabled = false;
+            
+            console.log(`✅ Template selected: ${templateType}`);
+        }
+
+        // 🔥 NEW: Send to New Leads with Selected Template
+        async function sendToNewLeads() {
+            if (!selectedTemplate) {
+                alert('❌ Please select a template first!');
+                return;
+            }
+            
+            if (!confirm(`Send emails to NEW leads using ${selectedTemplate.toUpperCase()} template?`)) {
+                return;
+            }
+            
+            try {
+                // Get all new leads
+                const response = await fetch(`${API_BASE}/leads/?limit=1000`);
+                const leads = await response.json();
+                
+                const newLeads = leads.filter(lead => lead.status === 'new');
+                
+                if (newLeads.length === 0) {
+                    alert('ℹ️ No new leads found!');
+                    return;
+                }
+                
+                if (!confirm(`Found ${newLeads.length} new leads. Start campaign?`)) {
+                    return;
+                }
+                
+                let successCount = 0;
+                let errorCount = 0;
+                
+                // Send emails with selected template
+                for (const lead of newLeads) {
+                    try {
+                        const response = await fetch(`${API_BASE}/campaigns/send-with-template`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                lead_id: lead.id,
+                                template_type: selectedTemplate
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                        }
+                        
+                        // Small delay to avoid overwhelming system
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                    } catch (error) {
+                        errorCount++;
+                        console.error(`Error sending to lead ${lead.id}:`, error);
+                    }
+                }
+                
+                alert(`✅ Campaign Complete!\n\n` +
+                      `Sent: ${successCount}\n` +
+                      `Errors: ${errorCount}\n` +
+                      `Template: ${selectedTemplate.toUpperCase()}`);
+                
+                loadLeads();
+                loadAgentStatus();
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // 🔥 NEW: Send Follow-ups (Original Templates)
+        async function sendFollowups() {
+            if (!confirm('Send follow-up emails? Each lead will use their ORIGINAL template.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/campaigns/send-followups`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                alert(`✅ Follow-ups Sent!\n\n` +
+                      `Glass Template: ${result.glass_count || 0}\n` +
+                      `Wood Template: ${result.wood_count || 0}\n` +
+                      `Total: ${result.total || 0}`);
+                
+                loadLeads();
+                loadAgentStatus();
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // 🔥 NEW: Pause Campaign
+        async function pauseCampaign() {
+            if (!confirm('Pause all campaigns?')) {
+                return;
+            }
+            
+            try {
+                await stopAgent();
+                alert('✅ All campaigns paused successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // Agent Status Loading
         async function loadAgentStatus() {
             try {
                 const response = await fetch(`${API_BASE}/agent/status`);
@@ -1063,6 +1379,7 @@
             }
         }
 
+        // File Upload Handlers
         const uploadZone = document.getElementById('upload-zone');
         const fileInput = document.getElementById('file-input');
 
