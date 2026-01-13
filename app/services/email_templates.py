@@ -80,4 +80,4 @@ def get_subject_for_industry(industry: str, company: str = None) -> str:
     if "glass" in industry_lower:
         return "One Price. Total Coverage. AMR + Scissor Lift Included"
     else:
-        return f"Automation Opportunity for {company}" if company else "Pilot Opportunity"
+        return f"8th Generation Autonomous Woodworking Robots" if company else "8th Generation Autonomous Woodworking Robots."

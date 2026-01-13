@@ -8,6 +8,7 @@ from app.database import SessionLocal
 from app.models.email_log import EmailLog
 from app.models.email_reply import EmailReply
 from app.models.agent_action_log import AgentActionLog
+from app.models.email_queue import EmailQueue  # ✅ ADD THIS
 from app.models.lead import Lead
 
 router = APIRouter()
@@ -69,6 +70,7 @@ def delete_all_leads(db: Session = Depends(get_db)):
     """
     try:
         # Delete in order due to foreign key constraints
+        deleted_queue = db.query(EmailQueue).delete()  # ✅ NEW
         deleted_replies = db.query(EmailReply).delete()
         deleted_logs = db.query(EmailLog).delete()
         deleted_actions = db.query(AgentActionLog).delete()
@@ -83,7 +85,8 @@ def delete_all_leads(db: Session = Depends(get_db)):
                 "leads": deleted_leads,
                 "email_logs": deleted_logs,
                 "email_replies": deleted_replies,
-                "agent_actions": deleted_actions
+                "agent_actions": deleted_actions,
+                "email_queue": deleted_queue  # ✅ NEW
             }
         }
     except Exception as e:

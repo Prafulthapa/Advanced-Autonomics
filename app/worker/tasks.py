@@ -8,7 +8,8 @@ from app.worker.celery_app import celery_app
 from app.database import SessionLocal
 from app.models.lead import Lead
 from app.models.email_log import EmailLog
-from app.models.email_queue import EmailQueue  # ✅ NEW
+from app.models.email_queue import EmailQueue
+from app.models.agent_config import AgentConfig
 
 from app.services.email_service import EmailService
 from app.services.ollama_service import OllamaService
@@ -20,26 +21,20 @@ from app.services.email_templates import (
 
 logger = logging.getLogger(__name__)
 
-# ============================================
-# ✅ TASK 2.3: RETRY LOGIC
-# ============================================
 
 @celery_app.task(
     name="generate_and_send_email_task",
-    bind=True,  # ✅ Required for self.retry()
-    max_retries=3,  # ✅ Maximum 3 retry attempts
-    default_retry_delay=300,  # ✅ Wait 5 minutes between retries
-    autoretry_for=(Exception,),  # ✅ Auto-retry on any exception
-    retry_backoff=True,  # ✅ Exponential backoff (5min, 10min, 20min)
-    retry_backoff_max=3600,  # ✅ Max backoff: 1 hour
-    retry_jitter=True  # ✅ Add randomness to prevent thundering herd
+    bind=True,
+    max_retries=3,
+    default_retry_delay=300,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_backoff_max=3600,
+    retry_jitter=True
 )
 def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
     """
-    Generate and send professional HTML email with embedded images
-    and AI-generated plain-text fallback.
-    
-    ✅ NEW: Includes retry logic and queue persistence
+    ✅ FIXED: Proper queue status tracking + rate limits only after success
     """
     db: Session = SessionLocal()
     queue_record = None
@@ -47,16 +42,15 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
     try:
         logger.info(f"🚀 Starting generate+send task for lead_id={lead_id} (attempt {self.request.retries + 1}/4)")
 
-        # ============================================
-        # ✅ TASK 2.4: LOAD FROM QUEUE TABLE
-        # ============================================
+        # ✅ FIX 1: Load and mark as processing IMMEDIATELY
         if queue_id:
             queue_record = db.query(EmailQueue).filter(EmailQueue.id == queue_id).first()
             if queue_record:
                 queue_record.status = "processing"
                 queue_record.task_id = self.request.id
                 queue_record.retry_count = self.request.retries
-                db.commit()
+                db.commit()  # ✅ Commit immediately so UI sees it
+                logger.info(f"✅ Queue {queue_id} marked as processing")
 
         # Fetch lead
         lead = db.query(Lead).filter(Lead.id == lead_id).first()
@@ -82,21 +76,17 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
         )
         company = lead.company or "your company"
 
-        # -----------------------------
         # Generate HTML email
-        # -----------------------------
         from app.services.html_email_templates_professional import get_full_professional_template
 
         html_body, images = get_full_professional_template(
             first_name=first_name,
             company=company,
             email=lead.email,
-            lead=lead  # 👈 ADD THIS LINE
+            lead=lead
         )
 
-        # -----------------------------
         # Generate plain-text fallback using AI
-        # -----------------------------
         template = get_template_for_industry(lead.industry)
         prompt = template.format(
             first_name=first_name or "there",
@@ -115,14 +105,10 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
             OllamaService.generate_email(prompt)
         )
 
-        # -----------------------------
         # Subject line
-        # -----------------------------
         subject = get_subject_for_industry(lead.industry, lead.company)
 
-        # -----------------------------
         # Inject unsubscribe link
-        # -----------------------------
         unsubscribe_link = (
             f"http://localhost:8000/unsubscribe?email={lead.email}"
         )
@@ -131,23 +117,19 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
             unsubscribe_link
         )
 
-        # -----------------------------
         # Send email
-        # -----------------------------
         to_name = f"{first_name} {last_name}".strip() or None
 
         success, error = EmailService.send_email(
             to_email=lead.email,
             subject=subject,
-            body=plain_text_body,   # Plain text fallback
+            body=plain_text_body,
             to_name=to_name,
-            html_body=html_body,    # HTML version
-            images=None          # Using CDN-hosted images
+            html_body=html_body,
+            images=None
         )
 
-        # -----------------------------
         # Log email
-        # -----------------------------
         email_log = EmailLog(
             lead_id=lead_id,
             subject=subject,
@@ -158,20 +140,28 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
         )
         db.add(email_log)
 
-        # -----------------------------
-        # Update lead state
-        # -----------------------------
+        # ============================================
+        # ✅ FIX: INCREMENT RATE LIMITS ONLY ON SUCCESS
+        # ============================================
         if success:
             lead.last_email_sent_at = datetime.utcnow()
             lead.status = "contacted" if lead.sequence_step == 0 else "follow_up"
             lead.sequence_step += 1
-            
-            # ✅ Update queue record
+
             if queue_record:
                 queue_record.status = "sent"
                 queue_record.sent_at = datetime.utcnow()
+                logger.info(f"✅ Queue {queue_id} marked as sent")
+
+            # ✅ INCREMENT COUNTERS AFTER SUCCESSFUL SEND
+            config = db.query(AgentConfig).first()
+            if config:
+                config.emails_sent_today += 1
+                config.emails_sent_this_hour += 1
+                config.total_emails_sent += 1
+                logger.info(f"📊 Updated counters: today={config.emails_sent_today}, hour={config.emails_sent_this_hour}")
+
         else:
-            # ✅ Update queue record with error
             if queue_record:
                 queue_record.status = "failed"
                 queue_record.last_error = error
@@ -189,7 +179,9 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
             "lead_id": lead_id,
             "email_log_id": email_log.id,
             "email_type": "professional_html",
-            "retry_count": self.request.retries
+            "retry_count": self.request.retries,
+            "queue_id": queue_id,
+            "queue_status": queue_record.status if queue_record else None
         }
 
     except Exception as e:
@@ -197,36 +189,33 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
             f"❌ Error in generate_and_send_email_task (attempt {self.request.retries + 1}): {str(e)}",
             exc_info=True
         )
-        
-        # ✅ Update queue record with error
+
         if queue_record:
+            queue_record.status = "failed"  # ✅ Mark as failed
             queue_record.last_error = str(e)
             queue_record.retry_count = self.request.retries + 1
             db.commit()
-        
+
         db.rollback()
-        
-        # ✅ RETRY LOGIC: Retry with exponential backoff
+
         try:
-            # Calculate retry delay: 5min, 10min, 20min
-            retry_delay = 300 * (2 ** self.request.retries)  # Exponential backoff
-            
+            retry_delay = 300 * (2 ** self.request.retries)
+
             logger.warning(
                 f"⚠️ Retrying in {retry_delay}s (attempt {self.request.retries + 2}/4)"
             )
-            
+
             raise self.retry(exc=e, countdown=retry_delay)
-            
+
         except MaxRetriesExceededError:
             logger.error(f"🚨 Max retries exceeded for lead_id={lead_id}")
-            
-            # ✅ Mark as permanently failed
+
             if queue_record:
                 queue_record.status = "failed"
                 queue_record.last_error = f"Max retries exceeded: {str(e)}"
                 queue_record.failed_at = datetime.utcnow()
                 db.commit()
-            
+
             return {"success": False, "error": "Max retries exceeded", "exception": str(e)}
 
     finally:
@@ -235,7 +224,7 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
 
 @celery_app.task(
     name="send_email_task",
-    bind=True,  # ✅ Required for self.retry()
+    bind=True,
     max_retries=3,
     default_retry_delay=300,
     autoretry_for=(Exception,),
@@ -252,7 +241,7 @@ def send_email_task(
     queue_id: int = None
 ):
     """
-    Backward-compatible email sender with retry logic.
+    ✅ FIXED: Rate limits only incremented on success + proper queue status tracking
     """
     db: Session = SessionLocal()
     queue_record = None
@@ -260,14 +249,15 @@ def send_email_task(
     try:
         logger.info(f"🚀 Starting email task for lead_id={lead_id} (attempt {self.request.retries + 1}/4)")
 
-        # ✅ Load from queue if provided
+        # ✅ FIX: Mark as processing immediately
         if queue_id:
             queue_record = db.query(EmailQueue).filter(EmailQueue.id == queue_id).first()
             if queue_record:
                 queue_record.status = "processing"
                 queue_record.task_id = self.request.id
                 queue_record.retry_count = self.request.retries
-                db.commit()
+                db.commit()  # ✅ Commit so UI sees "processing"
+                logger.info(f"✅ Queue {queue_id} marked as processing")
 
         lead = db.query(Lead).filter(Lead.id == lead_id).first()
         if not lead:
@@ -308,19 +298,31 @@ def send_email_task(
         )
         db.add(email_log)
 
+        # ✅ ONLY INCREMENT ON SUCCESS
         if success:
             lead.last_email_sent_at = datetime.utcnow()
             lead.status = "contacted"
             lead.sequence_step += 1
-            
+
             if queue_record:
                 queue_record.status = "sent"
                 queue_record.sent_at = datetime.utcnow()
+                logger.info(f"✅ Queue {queue_id} marked as sent")
+
+            # ✅ INCREMENT COUNTERS
+            config = db.query(AgentConfig).first()
+            if config:
+                config.emails_sent_today += 1
+                config.emails_sent_this_hour += 1
+                config.total_emails_sent += 1
+                logger.info(f"📊 Updated counters: today={config.emails_sent_today}, hour={config.emails_sent_this_hour}")
+
         else:
             if queue_record:
                 queue_record.status = "failed"
                 queue_record.last_error = error
                 queue_record.failed_at = datetime.utcnow()
+                logger.warning(f"❌ Queue {queue_id} marked as failed: {error}")
 
         db.commit()
 
@@ -333,6 +335,8 @@ def send_email_task(
             "error": error,
             "lead_id": lead_id,
             "email_log_id": email_log.id,
+            "queue_id": queue_id,
+            "status": "sent" if success else "failed",
             "retry_count": self.request.retries
         }
 
@@ -341,28 +345,29 @@ def send_email_task(
             f"❌ Error in send_email_task: {str(e)}",
             exc_info=True
         )
-        
+
         if queue_record:
+            queue_record.status = "failed"  # ✅ Mark as failed
             queue_record.last_error = str(e)
             queue_record.retry_count = self.request.retries + 1
             db.commit()
-        
+
         db.rollback()
-        
+
         try:
             retry_delay = 300 * (2 ** self.request.retries)
             logger.warning(f"⚠️ Retrying in {retry_delay}s")
             raise self.retry(exc=e, countdown=retry_delay)
-            
+
         except MaxRetriesExceededError:
             logger.error(f"🚨 Max retries exceeded for lead_id={lead_id}")
-            
+
             if queue_record:
-                queue_record.status = "failed"
+                queue_record.status = "failed"  # ✅ Permanently failed
                 queue_record.last_error = f"Max retries exceeded: {str(e)}"
                 queue_record.failed_at = datetime.utcnow()
                 db.commit()
-            
+
             return {"success": False, "error": "Max retries exceeded"}
 
     finally:

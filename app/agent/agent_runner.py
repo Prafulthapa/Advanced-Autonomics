@@ -1,7 +1,6 @@
 """
 Main AI Agent Runner
-Autonomous agent that manages email outreach
-✅ UPDATED: Now saves tasks to email_queue for persistence
+✅ FIXED: Rate limits now incremented in tasks.py AFTER successful send
 """
 
 from sqlalchemy.orm import Session
@@ -13,7 +12,7 @@ import time
 from app.database import SessionLocal
 from app.models.agent_config import AgentConfig
 from app.models.agent_action_log import AgentActionLog
-from app.models.email_queue import EmailQueue  # ✅ NEW
+from app.models.email_queue import EmailQueue
 from app.agent.decision_engine import DecisionEngine, DecisionType
 from app.agent.safety_controller import SafetyController
 from app.agent.state_manager import StateManager
@@ -146,7 +145,10 @@ class AgentRunner:
         return results
 
     def _execute_send_initial(self, decision):
-        """Execute initial email send with queue persistence."""
+        """
+        Execute initial email send with queue persistence.
+        ✅ FIXED: Rate limiter NO LONGER incremented here
+        """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
 
@@ -154,9 +156,7 @@ class AgentRunner:
 
         logger.info(f"📧 Queuing initial email for lead {lead.id} ({lead.email})")
 
-        # ============================================
-        # ✅ TASK 2.4: SAVE TO QUEUE TABLE FIRST
-        # ============================================
+        # Save to queue table
         queue_record = EmailQueue(
             lead_id=lead.id,
             subject=get_subject_for_industry(lead.industry, lead.company),
@@ -169,23 +169,26 @@ class AgentRunner:
         self.db.commit()
         self.db.refresh(queue_record)
 
-        # Queue email generation + sending task with queue_id
+        # Queue email task
         task = generate_and_send_email_task.delay(lead.id, queue_id=queue_record.id)
-        
-        # Update queue record with task ID
+
+        # Update queue with task ID
         queue_record.task_id = task.id
         self.db.commit()
 
         # Update lead state
         StateManager.transition_to_contacted(lead, self.db)
 
-        # Increment rate limit counters
-        RateLimiter.increment_counters(self.db)
+        # ❌ REMOVED: RateLimiter.increment_counters(self.db)
+        # ✅ NOW: Incremented in tasks.py AFTER successful send
 
         logger.info(f"✅ Initial email queued [task_id: {task.id}, queue_id: {queue_record.id}]")
 
     def _execute_send_followup(self, decision):
-        """Execute follow-up email send with queue persistence."""
+        """
+        Execute follow-up email send with queue persistence.
+        ✅ FIXED: Rate limiter NO LONGER incremented here
+        """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
 
@@ -193,7 +196,7 @@ class AgentRunner:
 
         logger.info(f"📧 Queuing follow-up #{lead.follow_up_count + 1} for lead {lead.id}")
 
-        # ✅ Save to queue table
+        # Save to queue
         queue_record = EmailQueue(
             lead_id=lead.id,
             subject=f"Follow-up: {get_subject_for_industry(lead.industry, lead.company)}",
@@ -206,17 +209,17 @@ class AgentRunner:
         self.db.commit()
         self.db.refresh(queue_record)
 
-        # Queue email task
+        # Queue task
         task = generate_and_send_email_task.delay(lead.id, queue_id=queue_record.id)
-        
+
         queue_record.task_id = task.id
         self.db.commit()
 
         # Update lead state
         StateManager.transition_to_follow_up(lead, self.db)
 
-        # Increment counters
-        RateLimiter.increment_counters(self.db)
+        # ❌ REMOVED: RateLimiter.increment_counters(self.db)
+        # ✅ NOW: Incremented in tasks.py AFTER successful send
 
         logger.info(f"✅ Follow-up queued [task_id: {task.id}, queue_id: {queue_record.id}]")
 
