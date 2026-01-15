@@ -1,6 +1,7 @@
 """
 Main AI Agent Runner
 ✅ FIXED: Rate limits now incremented in tasks.py AFTER successful send
+✅ UPDATED: Template override support added
 """
 
 from sqlalchemy.orm import Session
@@ -45,16 +46,26 @@ class AgentRunner:
 
         return config.is_running and not config.is_paused
 
-    def run_cycle(self) -> dict:
-        """Run one complete agent cycle."""
+    def run_cycle(self, template_override: str = None) -> dict:
+        """
+        Run one complete agent cycle.
+        
+        Args:
+            template_override: Force all emails to use specific template ('glass' or 'wood')
+        """
         start_time = time.time()
         self.run_id = str(uuid.uuid4())[:8]
 
         logger.info(f"🚀 Agent cycle starting [run_id: {self.run_id}]")
+        
+        # 🔥 Log template override if provided
+        if template_override:
+            logger.info(f"🎯 Template override: {template_override.upper()}")
 
         results = {
             "run_id": self.run_id,
             "started_at": datetime.utcnow().isoformat(),
+            "template_override": template_override,  # 🔥 Track which template
             "decisions_made": 0,
             "emails_queued": 0,
             "leads_skipped": 0,
@@ -103,11 +114,13 @@ class AgentRunner:
             for decision in decisions:
                 try:
                     if decision.action == DecisionType.SEND_INITIAL:
-                        self._execute_send_initial(decision)
+                        # 🔥 Pass template override to send function
+                        self._execute_send_initial(decision, template_override)
                         results["emails_queued"] += 1
 
                     elif decision.action == DecisionType.SEND_FOLLOWUP:
-                        self._execute_send_followup(decision)
+                        # 🔥 Follow-ups should use ORIGINAL template, not override
+                        self._execute_send_followup(decision, template_override=None)
                         results["emails_queued"] += 1
 
                     elif decision.action == DecisionType.SKIP:
@@ -144,15 +157,33 @@ class AgentRunner:
 
         return results
 
-    def _execute_send_initial(self, decision):
+    def _execute_send_initial(self, decision, template_override: str = None):
         """
         Execute initial email send with queue persistence.
-        ✅ FIXED: Rate limiter NO LONGER incremented here
+        
+        Args:
+            template_override: Force specific template ('glass' or 'wood')
         """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
 
         lead = decision.lead
+
+        # 🔥 APPLY TEMPLATE OVERRIDE
+        if template_override:
+            logger.info(f"🎯 Applying template override '{template_override}' to lead {lead.id}")
+            
+            # Store template choice in agent_notes
+            lead.agent_notes = f"template:{template_override}"
+            
+            # Update industry to match template
+            if template_override == "glass":
+                lead.industry = "Glass"
+            elif template_override == "wood":
+                lead.industry = "Wood"
+            
+            self.db.commit()
+            logger.info(f"✅ Lead {lead.id} updated: industry={lead.industry}, notes={lead.agent_notes}")
 
         logger.info(f"📧 Queuing initial email for lead {lead.id} ({lead.email})")
 
@@ -179,15 +210,13 @@ class AgentRunner:
         # Update lead state
         StateManager.transition_to_contacted(lead, self.db)
 
-        # ❌ REMOVED: RateLimiter.increment_counters(self.db)
-        # ✅ NOW: Incremented in tasks.py AFTER successful send
-
         logger.info(f"✅ Initial email queued [task_id: {task.id}, queue_id: {queue_record.id}]")
 
-    def _execute_send_followup(self, decision):
+    def _execute_send_followup(self, decision, template_override: str = None):
         """
-        Execute follow-up email send with queue persistence.
-        ✅ FIXED: Rate limiter NO LONGER incremented here
+        Execute follow-up email send.
+        
+        Note: Follow-ups should use ORIGINAL template, so template_override is ignored.
         """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
@@ -195,6 +224,9 @@ class AgentRunner:
         lead = decision.lead
 
         logger.info(f"📧 Queuing follow-up #{lead.follow_up_count + 1} for lead {lead.id}")
+
+        # 🔥 Follow-ups use ORIGINAL template (stored in agent_notes)
+        # Do NOT apply template_override here
 
         # Save to queue
         queue_record = EmailQueue(
@@ -217,9 +249,6 @@ class AgentRunner:
 
         # Update lead state
         StateManager.transition_to_follow_up(lead, self.db)
-
-        # ❌ REMOVED: RateLimiter.increment_counters(self.db)
-        # ✅ NOW: Incremented in tasks.py AFTER successful send
 
         logger.info(f"✅ Follow-up queued [task_id: {task.id}, queue_id: {queue_record.id}]")
 

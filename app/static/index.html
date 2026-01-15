@@ -66,7 +66,6 @@
             transform: translateY(-2px);
         }
 
-        /* 🔥 NEW: Template Selector Styles */
         .template-selector {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 25px;
@@ -142,7 +141,6 @@
             font-weight: 600;
         }
 
-        /* 🔥 NEW: Campaign Controls */
         .campaign-controls {
             background: white;
             padding: 25px;
@@ -571,7 +569,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div>
                 <h1>🤖 Advanced Autonomics AI Agent</h1>
@@ -584,7 +581,6 @@
             </div>
         </div>
 
-        <!-- 🔥 NEW: Template Selector -->
         <div class="template-selector">
             <h2>📧 Select Email Template for Campaign</h2>
             <div class="template-buttons">
@@ -604,11 +600,28 @@
             </div>
             
             <div class="selected-template-indicator">
-                <p id="selected-template-text">⚠️ No template selected - Please select one above to enable campaigns</p>
+                <p id="selected-template-text">⚠️ No template selected - "Run Now" will use automatic selection based on each lead's industry</p>
+                <!-- 🔥 NEW: Clear button -->
+        <button 
+            onclick="clearTemplateSelection()" 
+            style="
+                margin-top: 15px;
+                padding: 10px 20px;
+                background: transparent;
+                border: 2px solid rgba(255,255,255,0.3);
+                color: white;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+            "
+        >
+            🔄 Clear Selection (Use Automatic Mode)
+        </button>
+    </div>
+</div>
             </div>
         </div>
 
-        <!-- 🔥 NEW: Campaign Controls -->
         <div class="campaign-controls">
             <h2>🚀 Campaign Actions</h2>
             <div class="campaign-actions">
@@ -624,7 +637,6 @@
             </div>
         </div>
 
-        <!-- Agent Control Panel -->
         <div class="agent-control">
             <div class="agent-status">
                 <div class="agent-status-badge">
@@ -667,7 +679,6 @@
             </div>
         </div>
 
-        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Leads</h3>
@@ -687,7 +698,6 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <div class="tab-buttons">
                 <button class="tab-button active" onclick="showTab('leads')">👥 Leads</button>
@@ -699,7 +709,6 @@
                 <button class="tab-button" onclick="showTab('import')">📤 Import</button>
             </div>
 
-            <!-- Leads Tab -->
             <div class="tab-content active" id="tab-leads">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>All Leads</h2>
@@ -711,7 +720,6 @@
                 <div id="leads-table-container"></div>
             </div>
 
-            <!-- Analytics Tab -->
             <div class="tab-content" id="tab-analytics">
                 <h2 style="margin-bottom: 20px;">📊 Campaign Analytics</h2>
                 
@@ -736,7 +744,6 @@
                 </div>
             </div>
 
-            <!-- Queue Tab -->
             <div class="tab-content" id="tab-queue">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>📧 Email Queue</h2>
@@ -769,7 +776,6 @@
                 <div id="queue-items"></div>
             </div>
 
-            <!-- Replies Tab -->
             <div class="tab-content" id="tab-replies">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>💬 Email Replies</h2>
@@ -778,7 +784,6 @@
                 <div id="replies-container"></div>
             </div>
 
-            <!-- Logs Tab -->
             <div class="tab-content" id="tab-logs">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2>📋 Agent Activity Logs</h2>
@@ -787,7 +792,6 @@
                 <div id="logs-container"></div>
             </div>
 
-            <!-- Health Tab -->
             <div class="tab-content" id="tab-health">
                 <h2 style="margin-bottom: 20px;">💚 System Health Check</h2>
                 <div id="health-container">
@@ -795,7 +799,6 @@
                 </div>
             </div>
 
-            <!-- Import Tab -->
             <div class="tab-content" id="tab-import">
                 <h2 style="margin-bottom: 20px;">📤 Import CSV Leads</h2>
                 <p style="color: #666; margin-bottom: 30px;">Upload a CSV file with columns: email, first_name, last_name, company, industry, location</p>
@@ -836,38 +839,46 @@
     <script>
         const API_BASE = 'http://localhost:8000';
         let agentStatus = null;
-        let selectedTemplate = null; // 🔥 NEW: Track selected template
+        let selectedTemplate = null;
 
-        // Initialize
         setInterval(loadAgentStatus, 10000);
         loadAgentStatus();
         loadLeads();
 
-        // 🔥 NEW: Template Selection Function
         function selectTemplate(templateType) {
             selectedTemplate = templateType;
             
-            // Update UI - remove active from all, add to selected
             document.querySelectorAll('.template-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.getElementById(`template-${templateType}`).classList.add('active');
             
-            // Update indicator text
             const templateNames = {
-                'glass': '🪟 Glass Industry Template',
-                'wood': '🪵 Wood & Carpentry Template'
-            };
-            document.getElementById('selected-template-text').textContent = 
-                `✅ Selected: ${templateNames[templateType]} - Ready to send!`;
-            
-            // Enable the campaign button
-            document.getElementById('btn-send-new').disabled = false;
-            
-            console.log(`✅ Template selected: ${templateType}`);
-        }
+        'glass': '🪟 Glass Industry Template',
+        'wood': '🪵 Wood & Carpentry Template'
+    };
+    document.getElementById('selected-template-text').textContent = 
+        `✅ Selected: ${templateNames[templateType]} - "Run Now" will force ALL leads to use this template`;
+    
+    console.log(`✅ Template selected: ${templateType}`);
+}
 
-        // 🔥 NEW: Send to New Leads with Selected Template
+// 🔥 NEW: Add a "Clear Selection" function
+function clearTemplateSelection() {
+    selectedTemplate = null;
+    
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.getElementById('selected-template-text').textContent = 
+        'ℹ️ No template selected - "Run Now" will use automatic selection based on each lead\'s industry';
+    
+    console.log('✅ Template selection cleared - automatic mode enabled');
+}
+
+
+
         async function sendToNewLeads() {
             if (!selectedTemplate) {
                 alert('❌ Please select a template first!');
@@ -879,7 +890,6 @@
             }
             
             try {
-                // Get all new leads
                 const response = await fetch(`${API_BASE}/leads/?limit=1000`);
                 const leads = await response.json();
                 
@@ -887,8 +897,8 @@
                 
                 if (newLeads.length === 0) {
                     alert('ℹ️ No new leads found!');
-                    return;
-                }
+                    return
+                    }
                 
                 if (!confirm(`Found ${newLeads.length} new leads. Start campaign?`)) {
                     return;
@@ -897,7 +907,6 @@
                 let successCount = 0;
                 let errorCount = 0;
                 
-                // Send emails with selected template
                 for (const lead of newLeads) {
                     try {
                         const response = await fetch(`${API_BASE}/campaigns/send-with-template`, {
@@ -915,7 +924,6 @@
                             errorCount++;
                         }
                         
-                        // Small delay to avoid overwhelming system
                         await new Promise(resolve => setTimeout(resolve, 500));
                         
                     } catch (error) {
@@ -937,7 +945,6 @@
             }
         }
 
-        // 🔥 NEW: Send Follow-ups (Original Templates)
         async function sendFollowups() {
             if (!confirm('Send follow-up emails? Each lead will use their ORIGINAL template.')) {
                 return;
@@ -963,7 +970,6 @@
             }
         }
 
-        // 🔥 NEW: Pause Campaign
         async function pauseCampaign() {
             if (!confirm('Pause all campaigns?')) {
                 return;
@@ -977,7 +983,6 @@
             }
         }
 
-        // Agent Status Loading
         async function loadAgentStatus() {
             try {
                 const response = await fetch(`${API_BASE}/agent/status`);
@@ -1072,18 +1077,64 @@
         }
 
         async function runNow() {
-            if (!confirm('Run agent cycle now? This will queue emails immediately.')) return;
-            try {
-                const response = await fetch(`${API_BASE}/agent/run-now`, { method: 'POST' });
-                const result = await response.json();
-                alert(`✅ Agent cycle completed!\n\nQueued: ${result.results.emails_queued}\nSkipped: ${result.results.leads_skipped}\nErrors: ${result.results.errors}`);
-                loadAgentStatus();
-                loadAgentLogs();
-                loadQueueStatus();
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
+    // 🔥 Determine if template is selected
+    const hasTemplateSelected = selectedTemplate !== null;
+    
+    // 🔥 Build confirmation message
+    let confirmMessage;
+    if (hasTemplateSelected) {
+        confirmMessage = `Run agent cycle with ${selectedTemplate.toUpperCase()} template?\n\n` +
+                        `⚠️ ALL NEW LEADS will get the ${selectedTemplate.toUpperCase()} template, ` +
+                        `regardless of their industry.\n\n` +
+                        `Continue?`;
+    } else {
+        confirmMessage = `Run agent cycle with AUTOMATIC template selection?\n\n` +
+                        `✅ Each lead will get the correct template based on their industry:\n` +
+                        `   • Wood/Carpentry/Timber → Wood Template 🪵\n` +
+                        `   • Glass/Glazing/Window → Glass Template 🪟\n\n` +
+                        `Continue?`;
+    }
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    try {
+        // 🔥 CRITICAL: Only pass template if one is ACTUALLY selected
+        const url = hasTemplateSelected
+            ? `${API_BASE}/agent/run-now?template_override=${selectedTemplate}`
+            : `${API_BASE}/agent/run-now`; // ✅ No template param = automatic
+            
+        const response = await fetch(url, { method: 'POST' });
+        const result = await response.json();
+        
+        // 🔥 Show results with template info
+        const templateInfo = hasTemplateSelected
+            ? `\n🎯 Template: ${selectedTemplate.toUpperCase()} (forced for all leads)`
+            : `\n🤖 Template: AUTOMATIC (based on each lead's industry)`;
+        
+        alert(`✅ Agent cycle completed!\n` +
+              templateInfo +
+              `\n\nQueued: ${result.results.emails_queued}\n` +
+              `Skipped: ${result.results.leads_skipped}\n` +
+              `Errors: ${result.results.errors}`);
+        
+        // 🔥 IMPORTANT: Clear template selection after sending
+        selectedTemplate = null;
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById('selected-template-text').textContent = 
+            'ℹ️ No template selected - "Run Now" will use automatic selection based on each lead\'s industry';
+        
+        loadAgentStatus();
+        loadAgentLogs();
+        loadQueueStatus();
+        
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    }
+}
 
         async function loadLeads() {
             try {
@@ -1379,7 +1430,6 @@
             }
         }
 
-        // File Upload Handlers
         const uploadZone = document.getElementById('upload-zone');
         const fileInput = document.getElementById('file-input');
 

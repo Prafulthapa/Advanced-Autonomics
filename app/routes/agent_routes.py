@@ -3,9 +3,9 @@ Agent Control API Routes
 Endpoints to start, stop, monitor the AI agent
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 from app.database import SessionLocal
@@ -185,8 +185,11 @@ async def resume_agent(db: Session = Depends(get_db)):
 
 
 @router.post("/run-now")
-async def run_agent_cycle_now(db: Session = Depends(get_db)):
-    """Manually trigger one agent cycle immediately."""
+async def run_agent_cycle_now(
+    template_override: Optional[str] = Query(None, description="Template to use: 'glass' or 'wood'"),
+    db: Session = Depends(get_db)
+):
+    """Manually trigger one agent cycle immediately with optional template override."""
     config = db.query(AgentConfig).first()
     
     if not config:
@@ -198,13 +201,18 @@ async def run_agent_cycle_now(db: Session = Depends(get_db)):
             detail="Agent must be started first. Use POST /agent/start"
         )
     
-    # Run agent cycle
+    # 🔥 Validate template if provided
+    if template_override and template_override not in ['glass', 'wood']:
+        raise HTTPException(status_code=400, detail="Invalid template. Must be 'glass' or 'wood'")
+    
+    # Run agent cycle with template override
     agent = get_agent()
-    results = agent.run_cycle()
+    results = agent.run_cycle(template_override=template_override)
     
     return {
         "success": True,
-        "message": "Agent cycle completed",
+        "message": f"Agent cycle completed with {template_override or 'auto'} template",
+        "template_used": template_override,
         "results": results
     }
 
