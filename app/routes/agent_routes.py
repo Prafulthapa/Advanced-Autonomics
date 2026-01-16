@@ -185,34 +185,30 @@ async def resume_agent(db: Session = Depends(get_db)):
 
 
 @router.post("/run-now")
-async def run_agent_cycle_now(
-    template_override: Optional[str] = Query(None, description="Template to use: 'glass' or 'wood'"),
-    db: Session = Depends(get_db)
-):
-    """Manually trigger one agent cycle immediately with optional template override."""
+async def run_agent_cycle_now(db: Session = Depends(get_db)):  # 🔥 REMOVED template_override parameter
+    """
+    Manually trigger one agent cycle immediately.
+    WOOD ONLY - No template selection.
+    """
     config = db.query(AgentConfig).first()
-    
+
     if not config:
         raise HTTPException(status_code=404, detail="Agent config not found")
-    
+
     if not config.is_running:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="Agent must be started first. Use POST /agent/start"
         )
-    
-    # 🔥 Validate template if provided
-    if template_override and template_override not in ['glass', 'wood']:
-        raise HTTPException(status_code=400, detail="Invalid template. Must be 'glass' or 'wood'")
-    
-    # Run agent cycle with template override
+
+    # 🔥 WOOD ONLY: No template override - always wood
     agent = get_agent()
-    results = agent.run_cycle(template_override=template_override)
-    
+    results = agent.run_cycle()  # No parameter passed
+
     return {
         "success": True,
-        "message": f"Agent cycle completed with {template_override or 'auto'} template",
-        "template_used": template_override,
+        "message": "Agent cycle completed with WOOD template",
+        "template_used": "wood",  # Always wood
         "results": results
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Autonomics - Command Center</title>
+    <title>Advanced Autonomics - Wood Campaign Manager</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -35,7 +35,7 @@
         }
 
         .header h1 {
-            color: #667eea;
+            color: #8B4513;
             font-size: 32px;
             margin-bottom: 5px;
         }
@@ -52,7 +52,7 @@
 
         .quick-link {
             padding: 10px 20px;
-            background: #667eea;
+            background: #8B4513;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -62,135 +62,29 @@
         }
 
         .quick-link:hover {
-            background: #5568d3;
+            background: #A0522D;
             transform: translateY(-2px);
         }
 
-        .template-selector {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px;
+        .template-info {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
             color: white;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        
-        .template-selector h2 {
-            color: white;
-            margin: 0 0 20px 0;
-            font-size: 24px;
-        }
-        
-        .template-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .template-btn {
-            flex: 1;
-            min-width: 250px;
-            padding: 20px;
-            background: white;
-            border: 3px solid transparent;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
             text-align: center;
         }
         
-        .template-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .template-btn.active {
-            border-color: #ffcc00;
-            box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.3);
-        }
-        
-        .template-btn h3 {
-            color: #667eea;
-            font-size: 20px;
-            margin: 0 0 10px 0;
-        }
-        
-        .template-btn p {
-            color: #666;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .template-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        
-        .selected-template-indicator {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .selected-template-indicator p {
+        .template-info h2 {
             color: white;
-            font-size: 16px;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .campaign-controls {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            margin: 0 0 15px 0;
+            font-size: 28px;
         }
         
-        .campaign-controls h2 {
-            color: #667eea;
-            margin: 0 0 20px 0;
-        }
-        
-        .campaign-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .campaign-btn {
-            flex: 1;
-            min-width: 180px;
-            padding: 15px 25px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .campaign-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .campaign-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        .campaign-btn.warning {
-            background: #ff9800;
-        }
-
-        .campaign-btn.danger {
-            background: #f44336;
+        .template-info p {
+            font-size: 18px;
+            margin: 5px 0;
         }
 
         .agent-control {
@@ -199,6 +93,12 @@
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             margin-bottom: 30px;
+        }
+
+        .agent-control h2 {
+            color: #8B4513;
+            margin: 0 0 20px 0;
+            font-size: 24px;
         }
 
         .agent-status {
@@ -247,10 +147,10 @@
         }
 
         .agent-btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -271,8 +171,13 @@
             color: white;
         }
 
-        .agent-btn.run-now {
+        .agent-btn.resume {
             background: #2196f3;
+            color: white;
+        }
+
+        .agent-btn.run-now {
+            background: #9c27b0;
             color: white;
         }
 
@@ -340,7 +245,7 @@
         }
 
         .stat-card .value {
-            color: #667eea;
+            color: #8B4513;
             font-size: 36px;
             font-weight: bold;
         }
@@ -376,8 +281,8 @@
 
         .tab-button.active {
             background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
+            color: #8B4513;
+            border-bottom: 3px solid #8B4513;
         }
 
         .tab-content {
@@ -392,7 +297,7 @@
         }
 
         .btn {
-            background: #667eea;
+            background: #8B4513;
             color: white;
             border: none;
             padding: 12px 30px;
@@ -404,9 +309,9 @@
         }
 
         .btn:hover {
-            background: #5568d3;
+            background: #A0522D;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
         }
 
         .btn-danger {
@@ -445,7 +350,7 @@
         }
 
         tr:hover {
-            background: #f8f9ff;
+            background: #fff5f0;
         }
 
         .status-badge {
@@ -463,24 +368,24 @@
         .status-follow_up { background: #fff9c4; color: #f57f17; }
 
         .upload-zone {
-            border: 3px dashed #667eea;
+            border: 3px dashed #8B4513;
             border-radius: 12px;
             padding: 60px 40px;
             text-align: center;
-            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            background: linear-gradient(135deg, #8B451310 0%, #D2691E10 100%);
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 20px;
         }
 
         .upload-zone:hover {
-            border-color: #764ba2;
-            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-color: #D2691E;
+            background: linear-gradient(135deg, #8B451320 0%, #D2691E20 100%);
         }
 
         .upload-zone.dragging {
-            border-color: #764ba2;
-            background: linear-gradient(135deg, #667eea30 0%, #764ba230 100%);
+            border-color: #D2691E;
+            background: linear-gradient(135deg, #8B451330 0%, #D2691E30 100%);
         }
 
         #upload-progress {
@@ -493,7 +398,7 @@
         }
 
         #progress-bar {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #8B4513 0%, #D2691E 100%);
             height: 100%;
             width: 0%;
             transition: width 0.3s;
@@ -524,7 +429,7 @@
         }
 
         .analytics-card h3 {
-            color: #667eea;
+            color: #8B4513;
             margin-bottom: 15px;
         }
 
@@ -571,8 +476,8 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>🤖 Advanced Autonomics AI Agent</h1>
-                <p>Autonomous email outreach system with AI decision-making</p>
+                <h1>🪵 Advanced Autonomics - Wood Campaign Manager</h1>
+                <p>Autonomous email outreach for woodworking & carpentry industries</p>
             </div>
             <div class="quick-links">
                 <a href="/docs" class="quick-link" target="_blank">📚 API Docs</a>
@@ -581,63 +486,17 @@
             </div>
         </div>
 
-        <div class="template-selector">
-            <h2>📧 Select Email Template for Campaign</h2>
-            <div class="template-buttons">
-                <div class="template-btn" id="template-glass" onclick="selectTemplate('glass')">
-                    <div class="template-icon">🪟</div>
-                    <h3>Glass Industry</h3>
-                    <p>For glassworks, glazing, window manufacturers</p>
-                    <p style="margin-top: 10px; font-weight: 600; color: #667eea;">Price: $199,000 | AMR + Scissor Lift</p>
-                </div>
-                
-                <div class="template-btn" id="template-wood" onclick="selectTemplate('wood')">
-                    <div class="template-icon">🪵</div>
-                    <h3>Wood & Carpentry</h3>
-                    <p>For woodworking, furniture, timber industries</p>
-                    <p style="margin-top: 10px; font-weight: 600; color: #667eea;">8th Gen Carpentry Systems</p>
-                </div>
-            </div>
-            
-            <div class="selected-template-indicator">
-                <p id="selected-template-text">⚠️ No template selected - "Run Now" will use automatic selection based on each lead's industry</p>
-                <!-- 🔥 NEW: Clear button -->
-        <button 
-            onclick="clearTemplateSelection()" 
-            style="
-                margin-top: 15px;
-                padding: 10px 20px;
-                background: transparent;
-                border: 2px solid rgba(255,255,255,0.3);
-                color: white;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 14px;
-            "
-        >
-            🔄 Clear Selection (Use Automatic Mode)
-        </button>
-    </div>
-</div>
-            </div>
+        <!-- 🔥 WOOD ONLY TEMPLATE INFO -->
+        <div class="template-info">
+            <h2>🪵 Wood & Carpentry Template</h2>
+            <p>8th Generation Autonomous Woodworking Robots</p>
+            <p style="margin-top: 10px; font-size: 14px; opacity: 0.9;">All leads automatically receive wood-specific content</p>
+            <p style="margin-top: 5px; font-size: 13px; opacity: 0.8;">✅ Agent handles all sending - just start and monitor</p>
         </div>
 
-        <div class="campaign-controls">
-            <h2>🚀 Campaign Actions</h2>
-            <div class="campaign-actions">
-                <button class="campaign-btn" onclick="sendToNewLeads()" id="btn-send-new" disabled>
-                    ✉️ Send to New Leads (Selected Template)
-                </button>
-                <button class="campaign-btn warning" onclick="sendFollowups()">
-                    🔄 Send Follow-ups (Original Templates)
-                </button>
-                <button class="campaign-btn danger" onclick="pauseCampaign()">
-                    ⏸️ Pause All Campaigns
-                </button>
-            </div>
-        </div>
-
+        <!-- ✅ AGENT CONTROL WITH RESUME BUTTON -->
         <div class="agent-control">
+            <h2>🤖 Agent Control Panel</h2>
             <div class="agent-status">
                 <div class="agent-status-badge">
                     <div class="status-indicator stopped" id="agent-status-indicator"></div>
@@ -647,6 +506,7 @@
                     <button class="agent-btn start" id="btn-start" onclick="startAgent()">▶️ Start</button>
                     <button class="agent-btn stop" id="btn-stop" onclick="stopAgent()" disabled>⏹️ Stop</button>
                     <button class="agent-btn pause" id="btn-pause" onclick="pauseAgent()" disabled>⏸️ Pause</button>
+                    <button class="agent-btn resume" id="btn-resume" onclick="resumeAgent()" disabled>▶️ Resume</button>
                     <button class="agent-btn run-now" id="btn-run-now" onclick="runNow()" disabled>⚡ Run Now</button>
                 </div>
             </div>
@@ -805,10 +665,10 @@
                 
                 <div id="upload-zone" class="upload-zone">
                     <div style="font-size: 64px; margin-bottom: 20px;">📁</div>
-                    <h3 style="color: #667eea; margin-bottom: 10px;">Drag & Drop CSV File Here</h3>
+                    <h3 style="color: #8B4513; margin-bottom: 10px;">Drag & Drop CSV File Here</h3>
                     <p style="color: #999; margin: 15px 0;">or</p>
                     <button onclick="document.getElementById('file-input').click()" style="
-                        background: #667eea;
+                        background: #8B4513;
                         color: white;
                         border: none;
                         padding: 12px 32px;
@@ -839,182 +699,51 @@
     <script>
         const API_BASE = 'http://localhost:8000';
         let agentStatus = null;
-        let selectedTemplate = null;
 
+        // Auto-refresh every 10 seconds
         setInterval(loadAgentStatus, 10000);
         loadAgentStatus();
         loadLeads();
-
-        function selectTemplate(templateType) {
-            selectedTemplate = templateType;
-            
-            document.querySelectorAll('.template-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`template-${templateType}`).classList.add('active');
-            
-            const templateNames = {
-        'glass': '🪟 Glass Industry Template',
-        'wood': '🪵 Wood & Carpentry Template'
-    };
-    document.getElementById('selected-template-text').textContent = 
-        `✅ Selected: ${templateNames[templateType]} - "Run Now" will force ALL leads to use this template`;
-    
-    console.log(`✅ Template selected: ${templateType}`);
-}
-
-// 🔥 NEW: Add a "Clear Selection" function
-function clearTemplateSelection() {
-    selectedTemplate = null;
-    
-    document.querySelectorAll('.template-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    document.getElementById('selected-template-text').textContent = 
-        'ℹ️ No template selected - "Run Now" will use automatic selection based on each lead\'s industry';
-    
-    console.log('✅ Template selection cleared - automatic mode enabled');
-}
-
-
-
-        async function sendToNewLeads() {
-            if (!selectedTemplate) {
-                alert('❌ Please select a template first!');
-                return;
-            }
-            
-            if (!confirm(`Send emails to NEW leads using ${selectedTemplate.toUpperCase()} template?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/leads/?limit=1000`);
-                const leads = await response.json();
-                
-                const newLeads = leads.filter(lead => lead.status === 'new');
-                
-                if (newLeads.length === 0) {
-                    alert('ℹ️ No new leads found!');
-                    return
-                    }
-                
-                if (!confirm(`Found ${newLeads.length} new leads. Start campaign?`)) {
-                    return;
-                }
-                
-                let successCount = 0;
-                let errorCount = 0;
-                
-                for (const lead of newLeads) {
-                    try {
-                        const response = await fetch(`${API_BASE}/campaigns/send-with-template`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                lead_id: lead.id,
-                                template_type: selectedTemplate
-                            })
-                        });
-                        
-                        if (response.ok) {
-                            successCount++;
-                        } else {
-                            errorCount++;
-                        }
-                        
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        
-                    } catch (error) {
-                        errorCount++;
-                        console.error(`Error sending to lead ${lead.id}:`, error);
-                    }
-                }
-                
-                alert(`✅ Campaign Complete!\n\n` +
-                      `Sent: ${successCount}\n` +
-                      `Errors: ${errorCount}\n` +
-                      `Template: ${selectedTemplate.toUpperCase()}`);
-                
-                loadLeads();
-                loadAgentStatus();
-                
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
-
-        async function sendFollowups() {
-            if (!confirm('Send follow-up emails? Each lead will use their ORIGINAL template.')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/campaigns/send-followups`, {
-                    method: 'POST'
-                });
-                
-                const result = await response.json();
-                
-                alert(`✅ Follow-ups Sent!\n\n` +
-                      `Glass Template: ${result.glass_count || 0}\n` +
-                      `Wood Template: ${result.wood_count || 0}\n` +
-                      `Total: ${result.total || 0}`);
-                
-                loadLeads();
-                loadAgentStatus();
-                
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
-
-        async function pauseCampaign() {
-            if (!confirm('Pause all campaigns?')) {
-                return;
-            }
-            
-            try {
-                await stopAgent();
-                alert('✅ All campaigns paused successfully!');
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
 
         async function loadAgentStatus() {
             try {
                 const response = await fetch(`${API_BASE}/agent/status`);
                 const data = await response.json();
                 agentStatus = data;
-
-                const isRunning = data.agent.is_running;
+                
+    const isRunning = data.agent.is_running;
                 const isPaused = data.agent.is_paused;
 
                 const indicator = document.getElementById('agent-status-indicator');
                 const statusText = document.getElementById('agent-status-text');
 
+                // Update button states based on agent status
                 if (isRunning && !isPaused) {
+                    // Agent is running
                     indicator.className = 'status-indicator running';
                     statusText.textContent = 'Agent Running';
                     document.getElementById('btn-start').disabled = true;
                     document.getElementById('btn-stop').disabled = false;
                     document.getElementById('btn-pause').disabled = false;
+                    document.getElementById('btn-resume').disabled = true;
                     document.getElementById('btn-run-now').disabled = false;
                 } else if (isRunning && isPaused) {
+                    // Agent is paused (running but paused)
                     indicator.className = 'status-indicator paused';
                     statusText.textContent = 'Agent Paused';
                     document.getElementById('btn-start').disabled = true;
                     document.getElementById('btn-stop').disabled = false;
                     document.getElementById('btn-pause').disabled = true;
+                    document.getElementById('btn-resume').disabled = false;
                     document.getElementById('btn-run-now').disabled = true;
                 } else {
+                    // Agent is stopped
                     indicator.className = 'status-indicator stopped';
                     statusText.textContent = 'Agent Stopped';
                     document.getElementById('btn-start').disabled = false;
                     document.getElementById('btn-stop').disabled = true;
                     document.getElementById('btn-pause').disabled = true;
+                    document.getElementById('btn-resume').disabled = true;
                     document.getElementById('btn-run-now').disabled = true;
                 }
 
@@ -1042,7 +771,7 @@ function clearTemplateSelection() {
         }
 
         async function startAgent() {
-            if (!confirm('Start the AI agent? It will begin sending emails automatically.')) return;
+            if (!confirm('Start the AI agent? It will automatically send wood emails to qualified leads.')) return;
             try {
                 const response = await fetch(`${API_BASE}/agent/start`, { method: 'POST' });
                 const result = await response.json();
@@ -1054,7 +783,7 @@ function clearTemplateSelection() {
         }
 
         async function stopAgent() {
-            if (!confirm('Stop the agent?')) return;
+            if (!confirm('Stop the agent completely?')) return;
             try {
                 const response = await fetch(`${API_BASE}/agent/stop`, { method: 'POST' });
                 const result = await response.json();
@@ -1066,8 +795,21 @@ function clearTemplateSelection() {
         }
 
         async function pauseAgent() {
+            if (!confirm('Pause the agent? You can resume it later.')) return;
             try {
                 const response = await fetch(`${API_BASE}/agent/pause`, { method: 'POST' });
+                const result = await response.json();
+                alert('✅ Agent paused. Click "Resume" to continue.');
+                loadAgentStatus();
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        async function resumeAgent() {
+            if (!confirm('Resume the agent? It will continue from where it paused.')) return;
+            try {
+                const response = await fetch(`${API_BASE}/agent/resume`, { method: 'POST' });
                 const result = await response.json();
                 alert('✅ ' + result.message);
                 loadAgentStatus();
@@ -1077,64 +819,24 @@ function clearTemplateSelection() {
         }
 
         async function runNow() {
-    // 🔥 Determine if template is selected
-    const hasTemplateSelected = selectedTemplate !== null;
-    
-    // 🔥 Build confirmation message
-    let confirmMessage;
-    if (hasTemplateSelected) {
-        confirmMessage = `Run agent cycle with ${selectedTemplate.toUpperCase()} template?\n\n` +
-                        `⚠️ ALL NEW LEADS will get the ${selectedTemplate.toUpperCase()} template, ` +
-                        `regardless of their industry.\n\n` +
-                        `Continue?`;
-    } else {
-        confirmMessage = `Run agent cycle with AUTOMATIC template selection?\n\n` +
-                        `✅ Each lead will get the correct template based on their industry:\n` +
-                        `   • Wood/Carpentry/Timber → Wood Template 🪵\n` +
-                        `   • Glass/Glazing/Window → Glass Template 🪟\n\n` +
-                        `Continue?`;
-    }
-    
-    if (!confirm(confirmMessage)) {
-        return;
-    }
-    
-    try {
-        // 🔥 CRITICAL: Only pass template if one is ACTUALLY selected
-        const url = hasTemplateSelected
-            ? `${API_BASE}/agent/run-now?template_override=${selectedTemplate}`
-            : `${API_BASE}/agent/run-now`; // ✅ No template param = automatic
+            if (!confirm('Run agent cycle now with WOOD template?\n\nAgent will:\n- Check all leads\n- Send initial emails to new leads\n- Send follow-ups if timing is right\n- Respect all safety rules')) {
+                return;
+            }
             
-        const response = await fetch(url, { method: 'POST' });
-        const result = await response.json();
-        
-        // 🔥 Show results with template info
-        const templateInfo = hasTemplateSelected
-            ? `\n🎯 Template: ${selectedTemplate.toUpperCase()} (forced for all leads)`
-            : `\n🤖 Template: AUTOMATIC (based on each lead's industry)`;
-        
-        alert(`✅ Agent cycle completed!\n` +
-              templateInfo +
-              `\n\nQueued: ${result.results.emails_queued}\n` +
-              `Skipped: ${result.results.leads_skipped}\n` +
-              `Errors: ${result.results.errors}`);
-        
-        // 🔥 IMPORTANT: Clear template selection after sending
-        selectedTemplate = null;
-        document.querySelectorAll('.template-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById('selected-template-text').textContent = 
-            'ℹ️ No template selected - "Run Now" will use automatic selection based on each lead\'s industry';
-        
-        loadAgentStatus();
-        loadAgentLogs();
-        loadQueueStatus();
-        
-    } catch (error) {
-        alert('❌ Error: ' + error.message);
-    }
-}
+            try {
+                const response = await fetch(`${API_BASE}/agent/run-now`, { method: 'POST' });
+                const result = await response.json();
+                
+                alert(`✅ Agent cycle completed!\n\n🪵 Template: WOOD\n\nQueued: ${result.results.emails_queued}\nSkipped: ${result.results.leads_skipped}\nErrors: ${result.results.errors}`);
+                
+                loadAgentStatus();
+                loadAgentLogs();
+                loadQueueStatus();
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
 
         async function loadLeads() {
             try {

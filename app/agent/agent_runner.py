@@ -1,7 +1,6 @@
 """
-Main AI Agent Runner
-✅ FIXED: Rate limits now incremented in tasks.py AFTER successful send
-✅ UPDATED: Template override support added
+Main AI Agent Runner - WOOD ONLY VERSION
+Template override logic completely removed
 """
 
 from sqlalchemy.orm import Session
@@ -23,14 +22,14 @@ logger = logging.getLogger(__name__)
 
 
 class AgentRunner:
-    """Main autonomous agent controller."""
+    """Main autonomous agent controller - WOOD ONLY"""
 
     def __init__(self):
         self.run_id = str(uuid.uuid4())[:8]
         self.db: Session = SessionLocal()
         self.decision_engine = DecisionEngine(self.db)
 
-        logger.info(f"🤖 Agent initialized [run_id: {self.run_id}]")
+        logger.info(f"🤖 Agent initialized [run_id: {self.run_id}] - WOOD ONLY MODE")
 
     def __del__(self):
         """Cleanup."""
@@ -46,26 +45,21 @@ class AgentRunner:
 
         return config.is_running and not config.is_paused
 
-    def run_cycle(self, template_override: str = None) -> dict:
+    def run_cycle(self) -> dict:
         """
-        Run one complete agent cycle.
+        Run one complete agent cycle - WOOD ONLY.
         
-        Args:
-            template_override: Force all emails to use specific template ('glass' or 'wood')
+        🔥 REMOVED: template_override parameter - always wood now
         """
         start_time = time.time()
         self.run_id = str(uuid.uuid4())[:8]
 
-        logger.info(f"🚀 Agent cycle starting [run_id: {self.run_id}]")
-        
-        # 🔥 Log template override if provided
-        if template_override:
-            logger.info(f"🎯 Template override: {template_override.upper()}")
+        logger.info(f"🚀 Agent cycle starting [run_id: {self.run_id}] - WOOD ONLY")
 
         results = {
             "run_id": self.run_id,
             "started_at": datetime.utcnow().isoformat(),
-            "template_override": template_override,  # 🔥 Track which template
+            "template": "wood",  # Always wood
             "decisions_made": 0,
             "emails_queued": 0,
             "leads_skipped": 0,
@@ -114,13 +108,13 @@ class AgentRunner:
             for decision in decisions:
                 try:
                     if decision.action == DecisionType.SEND_INITIAL:
-                        # 🔥 Pass template override to send function
-                        self._execute_send_initial(decision, template_override)
+                        # 🔥 WOOD ONLY: No template override needed
+                        self._execute_send_initial(decision)
                         results["emails_queued"] += 1
 
                     elif decision.action == DecisionType.SEND_FOLLOWUP:
-                        # 🔥 Follow-ups should use ORIGINAL template, not override
-                        self._execute_send_followup(decision, template_override=None)
+                        # 🔥 WOOD ONLY: No template override
+                        self._execute_send_followup(decision)
                         results["emails_queued"] += 1
 
                     elif decision.action == DecisionType.SKIP:
@@ -157,33 +151,22 @@ class AgentRunner:
 
         return results
 
-    def _execute_send_initial(self, decision, template_override: str = None):
+    def _execute_send_initial(self, decision):
         """
-        Execute initial email send with queue persistence.
+        Execute initial email send - WOOD ONLY.
         
-        Args:
-            template_override: Force specific template ('glass' or 'wood')
+        🔥 REMOVED: template_override parameter
         """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
 
         lead = decision.lead
 
-        # 🔥 APPLY TEMPLATE OVERRIDE
-        if template_override:
-            logger.info(f"🎯 Applying template override '{template_override}' to lead {lead.id}")
-            
-            # Store template choice in agent_notes
-            lead.agent_notes = f"template:{template_override}"
-            
-            # Update industry to match template
-            if template_override == "glass":
-                lead.industry = "Glass"
-            elif template_override == "wood":
-                lead.industry = "Wood"
-            
-            self.db.commit()
-            logger.info(f"✅ Lead {lead.id} updated: industry={lead.industry}, notes={lead.agent_notes}")
+        # 🔥 WOOD ONLY: Force wood template
+        logger.info(f"🪵 Applying WOOD template to lead {lead.id}")
+        lead.agent_notes = "template:wood"
+        lead.industry = "Wood"
+        self.db.commit()
 
         logger.info(f"📧 Queuing initial email for lead {lead.id} ({lead.email})")
 
@@ -212,11 +195,9 @@ class AgentRunner:
 
         logger.info(f"✅ Initial email queued [task_id: {task.id}, queue_id: {queue_record.id}]")
 
-    def _execute_send_followup(self, decision, template_override: str = None):
+    def _execute_send_followup(self, decision):
         """
-        Execute follow-up email send.
-        
-        Note: Follow-ups should use ORIGINAL template, so template_override is ignored.
+        Execute follow-up email send - WOOD ONLY.
         """
         from app.worker.tasks import generate_and_send_email_task
         from app.services.email_templates import get_subject_for_industry
@@ -225,8 +206,11 @@ class AgentRunner:
 
         logger.info(f"📧 Queuing follow-up #{lead.follow_up_count + 1} for lead {lead.id}")
 
-        # 🔥 Follow-ups use ORIGINAL template (stored in agent_notes)
-        # Do NOT apply template_override here
+        # 🔥 WOOD ONLY: Ensure wood template
+        if "template:wood" not in (lead.agent_notes or ""):
+            lead.agent_notes = "template:wood"
+            lead.industry = "Wood"
+            self.db.commit()
 
         # Save to queue
         queue_record = EmailQueue(
@@ -284,6 +268,7 @@ class AgentRunner:
         return {
             "is_running": config.is_running,
             "is_paused": config.is_paused,
+            "template": "wood",  # Always wood
             "last_run": config.last_agent_run_at.isoformat() if config.last_agent_run_at else None,
             "emails_today": capacity['daily']['sent'],
             "daily_limit": capacity['daily']['limit'],

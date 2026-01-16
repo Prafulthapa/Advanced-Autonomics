@@ -80,15 +80,15 @@ services:
       context: .
       dockerfile: Dockerfile.scraper
     container_name: lead-scraper
+    command: python lead_scraper/scheduled_scraper.py
     volumes:
       - ./lead_scraper:/app/lead_scraper
       - ./data:/app/data
     environment:
-      - LINKEDIN_EMAIL=monkeymind4336@gmail.com
-      - LINKEDIN_PASSWORD=Nepal123!
       - REDIS_URL=redis://redis:6379/0 
+      - SCRAPER_RUN_HOUR=14  # 2 AM (change to 14 for 2 PM, etc.)
     depends_on:
-      - ollama
+      - redis
       - api
     restart: unless-stopped
 

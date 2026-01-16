@@ -1,154 +1,123 @@
 """
-Lead Orchestrator - Master script that runs everything
-UPDATED: Now pushes leads directly to email queue
+Lead Orchestrator - CARPENTRY VERSION
+NO LinkedIn - Uses Yellow Pages, True Local, Google Maps
+Pushes leads directly to email queue
 """
 
 import asyncio
 import logging
 import json
-import csv
 import requests
 from datetime import datetime
 from pathlib import Path
 
-from linkedin_scraper import LinkedInScraper
-from lead_enricher import LeadEnricher
-from email_finder import EmailFinder
-from celery_bridge import push_leads_batch, push_lead_to_email_queue  # NEW
+# Import the NEW carpentry scraper (not LinkedIn!)
+from carpentry_lead_scraper import CarpentryLeadScraper
+from celery_bridge import push_leads_batch
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 API_BASE = "http://api:8000"
 
 
 class LeadOrchestrator:
-    """Orchestrate the complete lead generation pipeline."""
-    
+    """Orchestrate carpentry lead generation pipeline."""
+
     def __init__(self):
-        self.scraper = LinkedInScraper()
-        self.enricher = LeadEnricher()
-        self.email_finder = EmailFinder()
-        
-        self.raw_leads = []
-        self.enriched_leads = []
-        self.leads_with_emails = []
-        
+        self.scraper = CarpentryLeadScraper()
+        self.all_leads = []
+
     async def run_pipeline(self):
         """Run the complete pipeline."""
-        logger.info("🚀 Starting lead generation pipeline...")
-        
+        logger.info("=" * 70)
+        logger.info("🚀 CARPENTRY LEAD PIPELINE STARTING")
+        logger.info("=" * 70)
+
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        # Step 1: Scrape LinkedIn
-        logger.info("=" * 60)
-        logger.info("STEP 1: LINKEDIN SCRAPING")
-        logger.info("=" * 60)
-        
-        self.scraper.setup_driver()
-        
-        if not self.scraper.login():
-            logger.error("❌ LinkedIn login failed, aborting")
+
+        # Step 1: Scrape carpentry businesses
+        logger.info("=" * 70)
+        logger.info("STEP 1: SCRAPING CARPENTRY BUSINESSES")
+        logger.info("=" * 70)
+
+        try:
+            self.scraper.run_full_scrape()
+            self.all_leads = self.scraper.all_leads
+        except Exception as e:
+            logger.error(f"❌ Scraping failed: {e}", exc_info=True)
             return
-        
-        self.raw_leads = self.scraper.run_all_searches()
-        self.scraper.cleanup()
-        
-        logger.info(f"✅ Step 1 complete: {len(self.raw_leads)} raw leads")
-        
-        if not self.raw_leads:
+
+        logger.info(f"✅ Step 1 complete: {len(self.all_leads)} leads scraped")
+
+        if not self.all_leads:
             logger.warning("⚠️ No leads scraped, pipeline stopping")
             return
-        
-        # Step 2: Enrich with AI
-        logger.info("=" * 60)
-        logger.info("STEP 2: AI ENRICHMENT")
-        logger.info("=" * 60)
-        
-        self.enriched_leads = await self.enricher.enrich_all_leads(self.raw_leads)
-        
-        logger.info(f"✅ Step 2 complete: {len(self.enriched_leads)} enriched leads")
-        
-        # Step 3: Find emails
-        logger.info("=" * 60)
-        logger.info("STEP 3: EMAIL FINDING")
-        logger.info("=" * 60)
-        
-        for lead in self.enriched_leads:
-            email, method = self.email_finder.find_email(lead)
-            
-            if email:
-                lead['email'] = email
-                lead['email_method'] = method
-                self.leads_with_emails.append(lead)
-        
-        logger.info(f"✅ Step 3 complete: {len(self.leads_with_emails)} leads with emails")
-        
-        # Step 4: Push to email queue (NEW!)
-        logger.info("=" * 60)
-        logger.info("STEP 4: PUSH TO EMAIL QUEUE")
-        logger.info("=" * 60)
-        
-        queued = push_leads_batch(self.leads_with_emails)
-        
-        logger.info(f"✅ Step 4 complete: {queued} leads queued for emailing")
-        
-        # Step 5: Save backup CSV
-        logger.info("=" * 60)
-        logger.info("STEP 5: SAVE BACKUP")
-        logger.info("=" * 60)
-        
-        csv_file = f"data/leads_{timestamp}.csv"
-        self.save_to_csv(self.leads_with_emails, csv_file)
-        
+
+        # Step 2: Push to email queue
+        logger.info("=" * 70)
+        logger.info("STEP 2: PUSH TO EMAIL QUEUE - PAUSED")
+        logger.info("=" * 70)
+
+        # Filter leads with emails
+        leads_with_email = [
+            lead for lead in self.all_leads
+            if lead.get('email') and '@' in lead.get('email', '')
+        ]
+
+        logger.info(f"📧 Leads with valid emails: {len(leads_with_email)}")
+
+        if leads_with_email:
+            queued = push_leads_batch(leads_with_email)
+            logger.info(f"✅ Step 2 complete: {queued} leads queued for emailing")
+        else:
+            logger.warning("⚠️ No leads with emails to queue")
+            queued = 0
+
+        # Step 3: Save backup
+        logger.info("=" * 70)
+        logger.info("STEP 3: SAVE BACKUP")
+        logger.info("=" * 70)
+
+        backup_file = f"data/carpentry_leads_{timestamp}.json"
+        self.save_backup(self.all_leads, backup_file)
+
         # Print summary
         self.print_summary(queued)
-    
-    def save_to_csv(self, leads, filename):
-        """Save leads to CSV backup."""
+
+    def save_backup(self, leads, filename):
+        """Save leads to JSON backup."""
         logger.info(f"💾 Saving backup to: {filename}")
-        
-        Path("data").mkdir(exist_ok=True)
-        
-        with open(filename, 'w', newline='', encoding='utf-8') as f:
-            if not leads:
-                return
-            
-            fieldnames = [
-                'email', 'first_name', 'last_name', 'company', 
-                'industry', 'location', 'title'
-            ]
-            
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            
-            for lead in leads:
-                row = {
-                    'email': lead.get('email', ''),
-                    'first_name': lead.get('first_name', lead.get('name', '').split()[0] if lead.get('name') else ''),
-                    'last_name': lead.get('last_name', lead.get('name', '').split()[-1] if lead.get('name') and len(lead.get('name', '').split()) > 1 else ''),
-                    'company': lead.get('clean_company_name', lead.get('company', '')),
-                    'industry': lead.get('industry', 'Robotics/Automation'),
-                    'location': lead.get('location', 'Australia'),
-                    'title': lead.get('title', '')
-                }
-                writer.writerow(row)
-        
-        logger.info(f"✅ Saved {len(leads)} leads to CSV backup")
-    
+
+        Path(filename).parent.mkdir(parents=True, exist_ok=True)
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(leads, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"✅ Saved {len(leads)} leads to backup")
+
     def print_summary(self, queued_count):
         """Print pipeline summary."""
-        logger.info("\n" + "=" * 60)
+        logger.info("\n" + "=" * 70)
         logger.info("📊 PIPELINE SUMMARY")
-        logger.info("=" * 60)
-        logger.info(f"Raw leads scraped:    {len(self.raw_leads)}")
-        logger.info(f"Leads enriched:       {len(self.enriched_leads)}")
-        logger.info(f"Emails found:         {len(self.leads_with_emails)}")
+        logger.info("=" * 70)
+        logger.info(f"Total leads scraped:  {len(self.all_leads)}")
         logger.info(f"Queued for emailing:  {queued_count}")
-        if self.raw_leads:
-            success_rate = len(self.leads_with_emails) / len(self.raw_leads) * 100
-            logger.info(f"Success rate:         {success_rate:.1f}%")
-        logger.info("=" * 60)
+        
+        # Source breakdown
+        sources = {}
+        for lead in self.all_leads:
+            source = lead.get('source', 'Unknown')
+            sources[source] = sources.get(source, 0) + 1
+        
+        logger.info("\n📍 Sources:")
+        for source, count in sources.items():
+            logger.info(f"  - {source}: {count}")
+        
+        logger.info("=" * 70)
 
 
 async def main():
