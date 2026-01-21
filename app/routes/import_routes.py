@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 import csv
 import io
+from datetime import datetime
 
 from app.database import SessionLocal
 from app.models.lead import Lead
@@ -95,11 +96,15 @@ async def import_leads_from_csv(
                     first_name=first_name,
                     last_name=last_name,
                     company=row.get('Name', '').strip() or None,
-                    industry="Glassworks",
+                    industry="Wood",  # ✅ CHANGED from "Glassworks"
                     location=row.get('State', '').strip() or "USA",
                     phone=row.get('Phone', '').strip() if row.get('Phone') != 'N/A' else None,
                     status="new",
-                    sequence_step=0
+                    sequence_step=0,
+                    agent_enabled=True,  # ✅ ADDED
+                    agent_paused=False,  # ✅ ADDED
+                    priority_score=5.0,  # ✅ ADDED
+                    next_agent_check_at=datetime.utcnow()  # ✅ ADDED - check immediately
                 )
                 print(f"SUCCESS: Created lead for '{email}'")
             else:
@@ -133,12 +138,16 @@ async def import_leads_from_csv(
                     first_name=row.get('first_name', '').strip() or None,
                     last_name=row.get('last_name', '').strip() or None,
                     company=row.get('company', '').strip() or None,
-                    industry=row.get('industry', '').strip() or None,
+                    industry=row.get('industry', '').strip() or "Wood",  # ✅ DEFAULT to Wood
                     location=row.get('location', '').strip() or None,
                     linkedin_url=row.get('linkedin_url', '').strip() or None,
                     phone=row.get('phone', '').strip() or None,
                     status="new",
-                    sequence_step=0
+                    sequence_step=0,
+                    agent_enabled=True,  # ✅ ADDED
+                    agent_paused=False,  # ✅ ADDED
+                    priority_score=5.0,  # ✅ ADDED
+                    next_agent_check_at=datetime.utcnow()  # ✅ ADDED
                 )
                 print(f"SUCCESS: Created lead for '{email}'")
 
@@ -175,8 +184,8 @@ async def import_leads_from_csv(
 async def get_csv_template():
     """Download a CSV template file."""
     template = """email,first_name,last_name,company,industry,location,linkedin_url,phone
-john.doe@example.com,John,Doe,Example Corp,Glassworks,USA,https://linkedin.com/in/johndoe,+1-555-0100
-jane.smith@testco.com,Jane,Smith,Test Co,3PL,USA,https://linkedin.com/in/janesmith,+1-555-0200
+john.doe@example.com,John,Doe,Example Corp,Wood,USA,https://linkedin.com/in/johndoe,+1-555-0100
+jane.smith@testco.com,Jane,Smith,Test Co,Wood,USA,https://linkedin.com/in/janesmith,+1-555-0200
 """
 
     return {

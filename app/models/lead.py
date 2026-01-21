@@ -18,6 +18,8 @@ class Lead(Base):
     location = Column(String, nullable=True)
     linkedin_url = Column(String, nullable=True)
     phone = Column(String, nullable=True)
+    website = Column(String, nullable=True)  # ✅ ADDED FOR CARPENTRY LEADS
+    source = Column(String, nullable=True)  # ✅ ADDED TO TRACK LEAD SOURCE
 
     # Campaign tracking
     status = Column(String, default="new", index=True)  # new, contacted, replied, interested, not_interested, unsubscribed, paused

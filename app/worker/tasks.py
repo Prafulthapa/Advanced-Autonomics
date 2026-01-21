@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 )
 def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
     """
-    ✅ FIXED: Proper queue status tracking + rate limits only after success
+    ✅ FIXED: Proper queue status tracking + NO duplicate counter increments
     """
     db: Session = SessionLocal()
     queue_record = None
@@ -141,7 +141,8 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
         db.add(email_log)
 
         # ============================================
-        # ✅ FIX: INCREMENT RATE LIMITS ONLY ON SUCCESS
+        # ✅ FIX: NO COUNTER INCREMENT HERE
+        # Counters are incremented in agent_runner.py
         # ============================================
         if success:
             lead.last_email_sent_at = datetime.utcnow()
@@ -153,19 +154,15 @@ def generate_and_send_email_task(self, lead_id: int, queue_id: int = None):
                 queue_record.sent_at = datetime.utcnow()
                 logger.info(f"✅ Queue {queue_id} marked as sent")
 
-            # ✅ INCREMENT COUNTERS AFTER SUCCESSFUL SEND
-            config = db.query(AgentConfig).first()
-            if config:
-                config.emails_sent_today += 1
-                config.emails_sent_this_hour += 1
-                config.total_emails_sent += 1
-                logger.info(f"📊 Updated counters: today={config.emails_sent_today}, hour={config.emails_sent_this_hour}")
+            # Rate limits are incremented by agent_runner.py when queuing
+            logger.info(f"✅ Email sent successfully to {lead.email}")
 
         else:
             if queue_record:
                 queue_record.status = "failed"
                 queue_record.last_error = error
                 queue_record.failed_at = datetime.utcnow()
+                logger.warning(f"❌ Email failed for {lead.email}: {error}")
 
         db.commit()
 
@@ -241,7 +238,7 @@ def send_email_task(
     queue_id: int = None
 ):
     """
-    ✅ FIXED: Rate limits only incremented on success + proper queue status tracking
+    ✅ FIXED: NO duplicate counter increments + proper queue status tracking
     """
     db: Session = SessionLocal()
     queue_record = None
@@ -298,7 +295,7 @@ def send_email_task(
         )
         db.add(email_log)
 
-        # ✅ ONLY INCREMENT ON SUCCESS
+        # ✅ NO COUNTER INCREMENT - handled by agent_runner.py
         if success:
             lead.last_email_sent_at = datetime.utcnow()
             lead.status = "contacted"
@@ -309,13 +306,8 @@ def send_email_task(
                 queue_record.sent_at = datetime.utcnow()
                 logger.info(f"✅ Queue {queue_id} marked as sent")
 
-            # ✅ INCREMENT COUNTERS
-            config = db.query(AgentConfig).first()
-            if config:
-                config.emails_sent_today += 1
-                config.emails_sent_this_hour += 1
-                config.total_emails_sent += 1
-                logger.info(f"📊 Updated counters: today={config.emails_sent_today}, hour={config.emails_sent_this_hour}")
+            # Rate limits incremented by agent_runner.py
+            logger.info(f"✅ Email sent successfully")
 
         else:
             if queue_record:

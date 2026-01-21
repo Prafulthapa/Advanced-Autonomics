@@ -1,6 +1,6 @@
 """
-Lead Scraper Configuration
-Australian carpentry, joinery, woodworking companies
+Lead Scraper Configuration - USA EDITION
+Ohio carpentry, joinery, woodworking companies
 NO LinkedIn - Uses public directories
 """
 
@@ -8,101 +8,105 @@ SCRAPER_CONFIG = {
     # Daily targets
     "daily_target": 500,
     "max_leads_per_source": 200,
-    
-    # Geographic focus (100% Australia)
+
+    # Geographic focus (100% USA, starting with Ohio)
     "geographic_split": {
-        "australia": 100,
-        "usa": 0,
+        "usa": 100,
+        "australia": 0,
         "europe": 0
     },
-    
-    # Target locations in Australia (Major cities + regions)
+
+    # Target locations in USA (Ohio focus + expansion)
     "target_locations": [
-        # NSW
-        "Sydney NSW",
-        "Newcastle NSW",
-        "Wollongong NSW",
-        "Central Coast NSW",
+        # OHIO - Primary Focus
+        "Columbus OH",
+        "Cleveland OH",
+        "Cincinnati OH",
+        "Toledo OH",
+        "Akron OH",
+        "Dayton OH",
+        "Parma OH",
+        "Canton OH",
+        "Youngstown OH",
+        "Lorain OH",
+        "Hamilton OH",
+        "Springfield OH",
+        "Kettering OH",
+        "Elyria OH",
+        "Lakewood OH",
+        "Cuyahoga Falls OH",
+        "Middletown OH",
+        "Newark OH",
+        "Mansfield OH",
+        "Mentor OH",
+        "Beavercreek OH",
+        "Strongsville OH",
+        "Dublin OH",
+        "Fairfield OH",
+        "Warren OH",
+        "Lima OH",
+        "Huber Heights OH",
+        "Marion OH",
+        "Findlay OH",
+        "Lancaster OH",
         
-        # VIC
-        "Melbourne VIC",
-        "Geelong VIC",
-        "Ballarat VIC",
-        
-        # QLD
-        "Brisbane QLD",
-        "Gold Coast QLD",
-        "Sunshine Coast QLD",
-        "Townsville QLD",
-        "Cairns QLD",
-        
-        # WA
-        "Perth WA",
-        "Mandurah WA",
-        
-        # SA
-        "Adelaide SA",
-        
-        # TAS
-        "Hobart TAS",
-        "Launceston TAS",
-        
-        # ACT
-        "Canberra ACT",
-        
-        # NT
-        "Darwin NT"
+        # Other states (for expansion later)
+        # "Detroit MI",
+        # "Indianapolis IN",
+        # "Pittsburgh PA",
+        # "Louisville KY",
+        # "Chicago IL",
     ],
-    
+
     # Industries (Carpentry/Woodworking focused)
     "industries": [
         "Carpentry",
-        "Joinery",
+        "Finish Carpentry",
+        "Framing",
         "Cabinet Making",
         "Woodworking",
-        "Timber Construction",
+        "Millwork",
         "Custom Furniture",
-        "Kitchen Renovations",
-        "Bathroom Renovations",
-        "Commercial Fit-outs",
+        "Kitchen Remodeling",
+        "Bathroom Remodeling",
+        "Commercial Carpentry",
         "Residential Construction",
         "Deck Building",
-        "Pergola Construction",
-        "Shopfitting",
-        "Office Fit-outs",
-        "Home Extensions",
-        "Renovation Contractors"
+        "Trim Carpentry",
+        "Door Installation",
+        "Window Installation",
+        "Flooring Installation",
+        "General Contracting"
     ],
-    
+
     # Keywords for carpentry/woodworking searches
     "industry_keywords": [
         "carpentry",
         "carpenter",
-        "joinery",
-        "joiner",
         "cabinet maker",
         "cabinetmaker",
         "woodworking",
-        "timber construction",
+        "finish carpentry",
+        "framing contractor",
         "custom carpentry",
-        "kitchen renovation",
-        "bathroom renovation",
+        "kitchen remodeling",
+        "bathroom remodeling",
         "commercial carpentry",
         "residential carpentry",
-        "fit out carpentry",
-        "shopfitting",
+        "trim carpenter",
+        "millwork",
+        "custom woodwork",
         "deck builder",
-        "pergola builder",
         "renovation carpentry",
-        "bespoke joinery",
-        "custom furniture"
+        "custom cabinetry",
+        "handyman carpentry",
+        "remodeling contractor"
     ],
-    
+
     # Job titles to find (decision makers)
     "job_titles": [
         "Owner",
-        "Director",
-        "Managing Director",
+        "President",
         "CEO",
         "Founder",
         "Principal",
@@ -110,37 +114,38 @@ SCRAPER_CONFIG = {
         "General Manager",
         "Operations Manager",
         "Business Owner",
-        "Head Carpenter",
+        "Lead Carpenter",
         "Master Carpenter",
-        "Lead Carpenter"
+        "Foreman",
+        "Project Manager"
     ],
-    
+
     # Company sizes (smaller businesses typical for carpentry)
     "company_sizes": [
         "1-10",      # Solo operators & small teams
         "11-50",     # Medium carpentry businesses
         "51-200",    # Larger contractors
     ],
-    
+
     # Scraping sources
     "scraping_sources": {
-        "yellow_pages": True,
-        "true_local": True,
-        "google_maps": False,  # Requires Selenium, slower
-        "hipages": False,      # Would need to implement
-        "service_seeking": False  # Would need to implement
+        "yellow_pages": True,     # YellowPages.com
+        "google_maps": True,      # Google Maps (best for local businesses)
+        "yelp": False,            # Could add later
+        "angi": False,            # Formerly Angie's List
+        "homeadvisor": False      # Could add later
     },
-    
+
     # Email finding methods
     "email_methods": {
         "scrape_website": True,   # Scrape company website
         "guess_pattern": True,    # Generate from company name
         "smtp_verify": False      # SMTP verification (slow, often blocked)
     },
-    
+
     # Run schedule (2 AM daily by default)
     "run_schedule": "0 2 * * *",  # Cron format: minute hour day month weekday
-    
+
     # Rate limiting (be respectful to avoid blocks)
     "delays": {
         "min_delay": 3,              # Minimum delay between requests (seconds)
@@ -149,14 +154,14 @@ SCRAPER_CONFIG = {
         "between_searches": 15,      # Delay between different searches
         "between_sources": 30        # Delay between different sources
     },
-    
+
     # Scraping limits per run
     "limits": {
         "max_pages_per_search": 3,   # Max pages to scrape per keyword/location
         "max_results_per_page": 50,  # Max results to process per page
         "daily_request_limit": 1000  # Max HTTP requests per day
     },
-    
+
     # Data quality
     "validation": {
         "require_email": False,       # Don't skip leads without email
@@ -166,49 +171,45 @@ SCRAPER_CONFIG = {
     }
 }
 
-# NO LinkedIn credentials needed anymore!
-# Carpentry scraper uses public directories only
-
 # Email pattern templates (for generating emails)
 EMAIL_PATTERNS = [
     "info@{domain}",
     "contact@{domain}",
     "admin@{domain}",
     "office@{domain}",
-    "enquiries@{domain}",
+    "inquiries@{domain}",
     "sales@{domain}",
     "{first}.{last}@{domain}",
     "{first}@{domain}",
     "{last}@{domain}"
 ]
 
-# Common Australian business email domains
+# Common USA business email domains
 COMMON_DOMAINS = [
-    ".com.au",
-    ".net.au",
-    ".org.au",
-    ".au"
+    ".com",
+    ".net",
+    ".us",
+    ".biz",
+    ".org"
 ]
 
 # Executive title patterns (for extracting names from websites)
 EXECUTIVE_TITLES = [
     "Owner",
-    "Director",
-    "Managing Director",
+    "President",
     "CEO",
     "Founder",
     "Principal",
     "Manager",
-    "Head Carpenter",
+    "Lead Carpenter",
     "Master Carpenter"
 ]
 
 # Words to remove from company names when generating emails
 COMPANY_NAME_STOPWORDS = [
-    "pty", "ltd", "inc", "llc", "limited",
-    "carpentry", "joinery", "services",
-    "group", "company", "co", "solutions",
-    "australia", "australian"
+    "inc", "llc", "ltd", "limited", "corp", "corporation",
+    "carpentry", "services", "company", "co", "solutions",
+    "group", "contractors", "construction"
 ]
 
 # Output configuration

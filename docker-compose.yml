@@ -80,17 +80,21 @@ services:
       context: .
       dockerfile: Dockerfile.scraper
     container_name: lead-scraper
-    command: python lead_scraper/scheduled_scraper.py
+    command: python lead_scraper/continuous_scraper.py  # ← NEW: Runs 24/7
     volumes:
       - ./lead_scraper:/app/lead_scraper
       - ./data:/app/data
     environment:
       - REDIS_URL=redis://redis:6379/0 
-      - SCRAPER_RUN_HOUR=14  # 2 AM (change to 14 for 2 PM, etc.)
+       - AUTO_PUSH_TO_QUEUE=false 
     depends_on:
       - redis
-      - api
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 # 🔻 REQUIRED TOP-LEVEL DEFINITIONS (THIS FIXES YOUR ERROR)
 volumes:

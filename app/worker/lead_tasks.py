@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @celery_app.task(name="process_scraped_lead")
 def process_scraped_lead(lead_data: dict):
-    """Process a scraped lead from LinkedIn."""
+    """Process a scraped lead (LinkedIn OR Carpentry/Google Maps)."""
     
     # ✅ LAZY IMPORT - only import when task actually runs
     from app.worker.tasks import generate_and_send_email_task
@@ -25,13 +25,15 @@ def process_scraped_lead(lead_data: dict):
     db: Session = SessionLocal()
 
     try:
-        logger.info(f"📥 Processing scraped lead: {lead_data.get('email')}")
-
         email = lead_data.get('email')
-
+        
         if not email:
             logger.warning("⚠️ No email in lead data, skipping")
             return {"success": False, "reason": "no_email"}
+
+        # Get company name for logging
+        company = lead_data.get('company') or lead_data.get('company_name', 'Unknown')
+        logger.info(f"📥 Processing scraped lead: {company} ({email})")
 
         # Check if already exists
         existing = db.query(Lead).filter(Lead.email == email).first()
@@ -40,21 +42,32 @@ def process_scraped_lead(lead_data: dict):
             logger.info(f"⚠️ Lead already exists: {email}")
             return {"success": False, "reason": "duplicate"}
 
-        # Parse name
+        # Parse name (handle both LinkedIn and carpentry formats)
         name = lead_data.get('name', '')
-        name_parts = name.split() if name else []
+        executive_name = lead_data.get('executive_name', '')
+        
+        # Use executive_name if available (carpentry), otherwise use name (LinkedIn)
+        full_name = executive_name if executive_name else name
+        
+        name_parts = full_name.split() if full_name else []
         first_name = name_parts[0] if len(name_parts) > 0 else lead_data.get('first_name', '')
-        last_name = name_parts[-1] if len(name_parts) > 1 else lead_data.get('last_name', '')
+        last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else lead_data.get('last_name', '')
 
-        # Create lead
+        # Handle carpentry-specific fields
+        company_name = lead_data.get('company_name') or lead_data.get('company', '')
+        
+        # Create lead (compatible with both LinkedIn and Carpentry data)
         lead = Lead(
             email=email,
             first_name=first_name,
             last_name=last_name,
-            company=lead_data.get('company', ''),
-            industry=lead_data.get('industry', 'Robotics/Automation'),
-            location=lead_data.get('location', 'Australia'),
+            company=company_name,
+            industry=lead_data.get('industry', 'Carpentry'),  # ✅ Default to Carpentry
+            location=lead_data.get('location') or lead_data.get('address', 'USA'),
+            phone=lead_data.get('phone', ''),  # ✅ Carpentry has phone
+            website=lead_data.get('website', ''),  # ✅ Carpentry has website
             linkedin_url=lead_data.get('linkedin_url', ''),
+            source=lead_data.get('source', 'Web Scraping'),  # ✅ Track source
             status="new",
             sequence_step=0,
             agent_enabled=True,
@@ -65,20 +78,21 @@ def process_scraped_lead(lead_data: dict):
         db.commit()
         db.refresh(lead)
 
-        logger.info(f"✅ Lead created: ID={lead.id}, {email}")
+        logger.info(f"✅ Lead created: ID={lead.id}, {company_name} ({email})")
 
-        # Queue email generation (with 30 second delay)
+        # Queue email generation (quick 5 second delay for scraped leads)
         task = generate_and_send_email_task.apply_async(
             args=[lead.id],
-            countdown=30
+            countdown=5  # ✅ Quick delay
         )
 
-        logger.info(f"📧 Email queued for lead {lead.id} [task: {task.id}]")
+        logger.info(f"📧 Email queued for lead {lead.id} → task {task.id}")
 
         return {
             "success": True,
             "lead_id": lead.id,
             "email": email,
+            "company": company_name,
             "task_id": task.id
         }
 

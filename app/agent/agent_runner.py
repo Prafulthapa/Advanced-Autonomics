@@ -48,7 +48,7 @@ class AgentRunner:
     def run_cycle(self) -> dict:
         """
         Run one complete agent cycle - WOOD ONLY.
-        
+
         🔥 REMOVED: template_override parameter - always wood now
         """
         start_time = time.time()
@@ -154,7 +154,7 @@ class AgentRunner:
     def _execute_send_initial(self, decision):
         """
         Execute initial email send - WOOD ONLY.
-        
+
         🔥 REMOVED: template_override parameter
         """
         from app.worker.tasks import generate_and_send_email_task
@@ -189,6 +189,9 @@ class AgentRunner:
         # Update queue with task ID
         queue_record.task_id = task.id
         self.db.commit()
+
+        # ✅ INCREMENT RATE LIMITS IMMEDIATELY (so agent knows capacity is reduced)
+        RateLimiter.increment_counters(self.db)
 
         # Update lead state
         StateManager.transition_to_contacted(lead, self.db)
@@ -230,6 +233,9 @@ class AgentRunner:
 
         queue_record.task_id = task.id
         self.db.commit()
+
+        # ✅ INCREMENT RATE LIMITS
+        RateLimiter.increment_counters(self.db)
 
         # Update lead state
         StateManager.transition_to_follow_up(lead, self.db)

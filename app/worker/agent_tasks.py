@@ -11,6 +11,8 @@ from app.database import SessionLocal
 from app.models.agent_config import AgentConfig
 from app.agent.agent_runner import get_agent
 from app.worker.celery_app import celery_app
+from app.models.email_queue import EmailQueue 
+from datetime import datetime, timedelta  # ✅ ADD timedelta
 
 logger = logging.getLogger(__name__)
 
