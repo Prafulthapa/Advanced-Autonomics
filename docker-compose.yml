@@ -86,7 +86,7 @@ services:
       - ./data:/app/data
     environment:
       - REDIS_URL=redis://redis:6379/0 
-       - AUTO_PUSH_TO_QUEUE=false 
+       - AUTO_PUSH_TO_QUEUE=true 
     depends_on:
       - redis
     restart: unless-stopped

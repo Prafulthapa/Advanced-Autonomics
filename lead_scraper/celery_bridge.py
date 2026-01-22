@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # 🛑 PAUSE FLAG - Set to False to only scrape WITHOUT sending to email queue
-AUTO_PUSH_TO_QUEUE = os.getenv("AUTO_PUSH_TO_QUEUE", "false").lower() == "true"
+AUTO_PUSH_TO_QUEUE = os.getenv("AUTO_PUSH_TO_QUEUE", "true").lower() == "true"
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
