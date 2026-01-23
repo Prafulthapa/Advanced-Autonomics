@@ -53,7 +53,7 @@ class AgentConfiguration:
                 'active_days': [1, 2, 3, 4, 5],  # Monday-Friday
             },
             'safety': {
-                'respect_business_hours': True,
+                'respect_business_hours': False,
                 'respect_unsubscribes': True,
                 'pause_on_high_error_rate': True,
             }

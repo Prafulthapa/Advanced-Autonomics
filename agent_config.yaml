@@ -16,7 +16,7 @@ limits:
   max_emails_per_day: 2000
   
   # Hourly limits (prevents bursts)
-  max_emails_per_hour: 60
+  max_emails_per_hour: 83
   
   # Per-lead limits
   max_follow_ups_per_lead: 3

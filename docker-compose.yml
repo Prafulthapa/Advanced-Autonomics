@@ -29,7 +29,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./agent_config.yaml:/app/agent_config.yaml
-       - /var/run/docker.sock:/var/run/docker.sock  # ✅ ADD THIS LINE
+      - /var/run/docker.sock:/var/run/docker.sock  # For Docker control
     env_file:
       - .env
     environment:
@@ -80,13 +80,13 @@ services:
       context: .
       dockerfile: Dockerfile.scraper
     container_name: lead-scraper
-    command: python lead_scraper/continuous_scraper.py  # ← NEW: Runs 24/7
+    command: python lead_scraper/continuous_scraper.py
     volumes:
       - ./lead_scraper:/app/lead_scraper
       - ./data:/app/data
     environment:
       - REDIS_URL=redis://redis:6379/0 
-       - AUTO_PUSH_TO_QUEUE=false  # ← NEW: Control auto-push to email queue 
+      - AUTO_PUSH_TO_QUEUE=true 
     depends_on:
       - redis
     restart: unless-stopped
@@ -96,7 +96,39 @@ services:
         max-size: "10m"
         max-file: "3"
 
-# 🔻 REQUIRED TOP-LEVEL DEFINITIONS (THIS FIXES YOUR ERROR)
+  # ============================================
+  # ✅ AUTO-IMPORT SERVICE
+  # Runs once on startup to import scraped leads
+  # ⚠️  With 5,200 leads, this takes ~5-10 minutes
+  # ============================================
+  auto-import:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.api  # Reuse API dockerfile
+    container_name: auto-import
+    volumes:
+      - ./data:/app/data
+      - ./auto_import_scraped_leads.py:/app/auto_import_scraped_leads.py
+    env_file:
+      - .env
+    depends_on:
+      - api
+      - redis
+    command: >
+      sh -c "
+        echo '⏳ Waiting 15 seconds for API to be ready...' &&
+        sleep 15 &&
+        echo '🤖 Starting auto-import of scraped leads...' &&
+        echo '⚠️  Large import (5,200+ leads) may take 5-10 minutes' &&
+        python /app/auto_import_scraped_leads.py &&
+        echo '✅ Auto-import complete! Container will exit.' &&
+        exit 0
+      "
+    restart: "no"  # Run once per docker-compose up
+
+# ============================================
+# 🔻 REQUIRED TOP-LEVEL VOLUME DEFINITIONS
+# ============================================
 volumes:
   ollama:
   redis-data:

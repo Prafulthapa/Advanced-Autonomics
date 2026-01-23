@@ -31,7 +31,7 @@ class AgentConfig(Base):
     inbox_check_interval = Column(Integer, default=15)
     
     # Safety settings
-    respect_business_hours = Column(Boolean, default=True)
+    respect_business_hours = Column(Boolean, default=False)
     respect_unsubscribes = Column(Boolean, default=True)
     pause_on_high_error_rate = Column(Boolean, default=True)
     error_rate_threshold = Column(Integer, default=10)
